@@ -37,3 +37,15 @@ Le rendu interactif dans un navigateur n’a pas été testé dans cet environne
 Les autres objets portés ou utilisés (accessoires, bijoux, vêtements, etc.) contribuent également aux caractéristiques modifiées, à l’attaque et à la parade, dans les deux modèles PDF. Sur la page de préparation du PDF, des cases permettent de désactiver les effets des objets simplement transportés. Les valeurs initiales sont conservées dans les cases d’origine ; les valeurs modifiées sont inscrites à côté.
 
 Les effets conditionnels, les bonus à un jet précis et les consommables non utilisés restent décrits dans les effets des objets et dans l’annexe ; ils ne sont pas traités comme des bonus permanents.
+
+## Grimoire commun aux mages
+
+Le « Grimoire des Ordres Néfastes — Magie généraliste — niveau 1 » est disponible gratuitement dans les Livres de sorcellerie pour tous les mages, y compris les mages culinaires hobbits. Il s’ajoute au grimoire gratuit de spécialité lorsqu’il existe. Un seul exemplaire peut être ajouté au paquetage.
+
+## Nom et description des animaux
+
+Dès l’ajout d’un animal ou d’une monture au paquetage, deux champs facultatifs permettent de saisir son nom (50 caractères) et une description sommaire (160 caractères). Chaque animal possède ses propres champs, même lorsque deux animaux du même type sont achetés. Ces informations sont conservées pendant la création et reprises dans le récapitulatif et le PDF, dans « Machins précieux » pour la fiche classique. Le texte complet reste dans l’annexe si la ligne de la fiche manque de place.
+
+## Présentation du petit matériel de bivouac
+
+Le petit matériel de camping (outre, torches, briquet, etc.) est désormais inscrit à la suite, séparé par des points-virgules. Le texte passe à la ligne uniquement lorsque la largeur disponible est atteinte. Les emplacements dédiés à la tente, au matelas et à la couverture sont conservés.

@@ -1,6 +1,7 @@
 import {MAGIC_DISCIPLINES,PRIEST_DEITIES,PALADIN_DEITIES} from './affiliations.js';
 export const MOOTE_PROFILES=['Semi-homme de la Loi','Mage culinaire hobbit','Paladin semi-homme de Picrate','Paladin semi-homme de Jord’hun'];
 export const isMooteProfile=profile=>MOOTE_PROFILES.includes(profile.origin)||MOOTE_PROFILES.includes(profile.job);
+export const isMageProfile=profile=>profile.job==='Mage / Sorcier'||profile.job==='Mage culinaire hobbit'||profile.origin==='Mage culinaire hobbit';
 export const equipmentPriceLimit=profile=>profile.job==='Bourgeois / Noble'?36000:20000;
 const normalized=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 export const servesNiourgl=profile=>['Prêtre','Paladin'].includes(profile.job)&&normalized(profile.affiliation).trim()==='niourgl';
@@ -8,7 +9,7 @@ export const isTzinntchMage=profile=>profile.job==='Mage / Sorcier'&&normalized(
 export function equipmentTabs(profile){
  const tabs=['Armes','Protections','Divers'];
  if(['Prêtre','Paladin'].includes(profile.job))tabs.push('Prêtres et Paladins');
- if(profile.job==='Mage / Sorcier')tabs.push('Mages et Sorciers');
+ if(isMageProfile(profile))tabs.push('Mages et Sorciers');
  if(servesNiourgl(profile))tabs.push('NIOURGL');
  if(isMooteProfile(profile))tabs.push('CAMHiF');
  return tabs;
@@ -36,6 +37,7 @@ export function catalogForProfile(items,profile){
  });
  const manual=startingManual(profile);
  if(manual)allowed.push(manual);
+ if(isMageProfile(profile))allowed.push({id:'manuel-depart-mage-magie-generaliste',name:'Grimoire des Ordres Néfastes — Magie généraliste — niveau 1',pricePc:0,currency:'PO',kind:'book',category:'Mages et Sorciers',section:'Livres de sorcellerie',catalog:'standard',source:'Manuel de départ gratuit',notes:'Magie accessible à tous les mages, quelle que soit leur spécialité. Grimoire offert à la création, en complément du grimoire de spécialité, sans dépense du budget d’équipement.',unique:true});
  return allowed.map(item=>item.kind==='armor'&&item.pr==null?{...item,pr:0}:item);
 }
 
@@ -48,6 +50,7 @@ export function weaponForms(item){
 export function resolveEquipmentItem(saved,catalog){
  const base=catalog.get(saved.baseId||saved.id);if(!base)return null;
  if(saved.baseId&&weaponForms(base).includes(saved.weaponForm))return {...base,id:saved.id,baseId:base.id,weaponForm:saved.weaponForm,name:weaponChoiceName(base,saved.weaponForm)};
+ if(saved.animalInstance)return {...saved,...base,id:saved.id,baseId:base.id,animalInstance:true,animalName:saved.animalName||'',animalDescription:saved.animalDescription||''};
  return {...saved,...base};
 }
 export function weaponChoiceName(base,form){
@@ -57,3 +60,6 @@ export function weaponChoiceName(base,form){
  const suffix=quality==='correcte'?'de qualité correcte':quality==='bonne qualité'?'de bonne qualité':quality;
  return form+' à une main '+suffix;
 }
+
+export const isAnimal=item=>item?.kind==='mount'&&!/charrette|chariot|carrosse|carriole|tra[iî]neau|véhicule|bateau|barque/i.test(item.name||'');
+export function animalLabel(item){return item.name+(item.animalName?' — '+item.animalName:'')+(item.animalDescription?' : '+item.animalDescription:'');}

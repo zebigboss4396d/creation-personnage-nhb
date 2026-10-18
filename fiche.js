@@ -1,5 +1,5 @@
 import {groupEquipment,quantityName} from './equipment-quantities.js';
-import {catalogForProfile,resolveEquipmentItem} from './equipment-rules.js';
+import {catalogForProfile,resolveEquipmentItem,animalLabel} from './equipment-rules.js';
 import {equipmentKind} from './equipment-categories.js';
 import {routeEquipment,armorOrder} from './equipment-routing.js';
 import {ORIGIN_DETAILS,BEAST_DETAILS,JOB_DETAILS} from './creation-details.js';
@@ -19,7 +19,7 @@ export function prepareData(c,skillCatalog={}){
  const affinity=c.affiliation||(/Picrate|Jord.hun/.test(c.origin)?c.origin.match(/Picrate|Jord.hun/)?.[0]:'')||'';
  const sense=SENSES[c.origin?.startsWith('Homme-bête')?'Homme-bête':c.origin]||{};
  const sourceItems=Array.isArray(c.equipment)?c.equipment.map(i=>equipmentKind(i)==='armor'&&i.pr==null?{...i,pr:0}:i):[];
- const items=groupEquipment(sourceItems).map(i=>({...i,originalName:i.name,name:quantityName(i)}));
+ const items=groupEquipment(sourceItems).map(i=>({...i,originalName:i.name,name:animalLabel({...i,name:quantityName(i)})}));
  const pc=items.reduce((total,i)=>total+(Number(i.pricePc)||0),0);
  const money=pc=>`${(pc/100).toLocaleString('fr-FR',{maximumFractionDigits:2})} PO`;
  const values={magphys:ceil((s.INT+s.AD)/2),magpsy:ceil((s.INT+s.CHA)/2),resmag:ceil((s.COU+s.INT+s.FOR)/3),esquive:s.AD,inge:ceil((s.INT+s.AD)/2),pres:ceil((s.AD+s.CHA)/2),perc:s.INT,impact:(s.FOR>12?s.FOR-12:s.FOR<=8?-1:0)+(Number(c.choices?.ogreAt)||0)+(Number(c.choices?.ogrePrd)||0)};
@@ -38,7 +38,7 @@ function withEffects(data,weaponIndex=0,armorIndices=defaultArmorIndices(data.eq
  return {...data,effect,groups:[...data.groups,['Effets du matériel',effectsLines,...itemLines]]};
 }
 function textField(form,name,value,max=100){
- try{const field=form.getTextField(name);if(typeof field.disableCombing==='function')field.disableCombing();if(/^(?:ArmeBonMal|ArmureBonMal|Arme0|Armure0)/.test(name))field.setFontSize(9);field.setText(String(value??'').slice(0,max));return true;}catch{return false;}
+ try{const field=form.getTextField(name);if(typeof field.disableCombing==='function')field.disableCombing();if(/^Text(?:[2-7])?$/.test(name))field.setFontSize(30);if(/^(?:ArmeBonMal|ArmureBonMal|Arme0|Armure0)/.test(name))field.setFontSize(9);field.setText(String(value??'').slice(0,max));return true;}catch{return false;}
 }
 function fillInteractive(form,d){
  const s=d.stats,v=d.values,e=d.equipment,fx=d.effect;
@@ -66,7 +66,7 @@ function fillInteractive(form,d){
  ['tête','bras','bouclier','torse','mains','jambes','pieds'].forEach((k,n)=>{if(locations[k])textField(form,`PRLOC0${n+1}`,locations[k]);});
  if(fx.basePr)textField(form,'PRTOTAL',fx.basePr);
 }
-function fillClassic(form,d){
+function fillClassic(form,d,font=null){
  const s=d.stats,v=d.values,e=d.equipment,fx=d.effect;
  const map={Nom:d.name,Origine:d.origin,'Métiers':d.job||'Sans métier',Niveau:1,'EV-PV MAX':d.ev,PV1:d.ev,'EA-PA Max':d.ea,PA1:d.ea,'Points de destin':d.destiny,MagiePhys:v.magphys,MagiePsy:v.magpsy,ResitMagie:v.resmag,OR:d.gold,COU:s.COU,INT:s.INT,CHA:s.CHA,AD:s.AD,FO:s.FOR,Attaque:d.at,Attaque1:d.at,Parade:d.prd,Parrade1:d.prd,Experience:0,Competences:d.skills[0]||'',Competences1:d.skills[1]||'',Competences2:d.skills[2]||'',Competences3:d.skills[3]||'',Competences4:d.skills[4]||'',Competences5:d.skills[5]||'',Competences6:d.skills[6]||'',Competences7:d.skills[7]||'',Competences8:d.skills[8]||'',Competences9:d.skills[9]||'',Competences10:d.skills[10]||'',Competences11:d.skills[11]||'',ArmePrincipale:e.weapons[0]?.name||'',ArmeSecondaire:e.weapons[1]?.name||'',ArmeSupplementaire:e.weapons[2]?.name||'',Tente:(d.routed.tents||[]).map(i=>i.name).join(' ; '),Matelas:(d.routed.mattresses||[]).map(i=>i.name).join(' ; '),Couverture:(d.routed.blankets||[]).map(i=>i.name).join(' ; '),Sac:(d.routed.backpacks||[]).map(i=>i.name).join(' ; '),Besace:(d.routed.satchels||[]).map(i=>i.name).join(' ; '),Bourse:d.routed.purses?.[0]?.name||'',Bourse2:(d.routed.purses||[]).slice(1).map(i=>i.name).join(' ; '),Autre:(d.routed.containers||[]).map(i=>i.name).join(' ; ')};
  e.armor.slice(0,7).forEach((i,n)=>map[`Armures et proctections ${n+1}`]=i.name);
@@ -74,7 +74,8 @@ function fillClassic(form,d){
  [...e.potions,...e.poisons].slice(0,7).forEach((i,n)=>map[['Doses','Doses2','Doses3','Doses4','Doses5','Doses6','Doses7'][n]]=i.name);
  (d.routed.special||[]).slice(0,6).forEach((i,n)=>{const suffix=n?String(n+1):'';map['Objets speciaux'+suffix]=i.name;map['Objets speciaux effets'+suffix]=i.notes||'';});
  (d.routed.mounts||[]).slice(0,4).forEach((i,n)=>map['Machins Precieux'+(n?String(n+1):'')]=i.name);
- (d.routed.camping||[]).slice(0,7).forEach((i,n)=>map[n?'Text'+(n+1):'Text']=i.name);
+ const campingLines=wrap((d.routed.camping||[]).map(i=>i.name).join(' ; '),font||{widthOfTextAtSize:(t,size)=>t.length*size*.55},30,640);
+ campingLines.slice(0,7).forEach((line,n)=>map[n?'Text'+(n+1):'Text']=line);
 
  for(const [name,value] of Object.entries(map))if(value!==undefined)textField(form,name,value,95);
  for(const [key,field] of Object.entries({COU:'cou1',INT:'INT1',CHA:'CHA1',AD:'AD1',FOR:'FO1'}))if(fx.modifiers[key])textField(form,field,fx.altered[key]);
@@ -114,9 +115,10 @@ export async function buildPdf(kind,d,template){
  if(!d.effect)d=withEffects(d);
  if(d.effect.conflicts.length)throw Error('Deux protections occupent le même emplacement : '+d.effect.conflicts.join(' ; '));if(d.effect.limitExceeded)throw Error('Protection '+d.effect.basePr+' supérieure à la limite '+d.effect.prLimit+' du profil. Modifiez les pièces portées.');
  const pdf=await PDFDocument.load(template,{ignoreEncryption:false});const form=pdf.getForm();
- if(kind==='interactive')fillInteractive(form,d);else fillClassic(form,d);
+ const fieldFont=await pdf.embedFont(StandardFonts.Helvetica);
+ if(kind==='interactive')fillInteractive(form,d);else fillClassic(form,d,fieldFont);
  // Conserver des champs éditables, y compris après téléchargement.
- form.updateFieldAppearances(await pdf.embedFont(StandardFonts.Helvetica));
+ form.updateFieldAppearances(fieldFont);
  await addAnnex(pdf,d);
  return pdf.save({useObjectStreams:false});
 }
