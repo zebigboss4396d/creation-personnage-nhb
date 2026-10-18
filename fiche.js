@@ -1,3 +1,4 @@
+import {catalogForProfile} from './equipment-rules.js';
 import {equipmentKind} from './equipment-categories.js';
 import {ORIGIN_DETAILS,BEAST_DETAILS,JOB_DETAILS} from './creation-details.js';
 import {SENSES} from './creation-rules.js';
@@ -112,7 +113,7 @@ export async function buildPdf(kind,d,template){
 async function init(){
  if(!window.PDFLib)throw Error('Le module PDF est manquant. Ajoutez pdf-lib.min.js au dépôt.');
  const response=await fetch('./skills.json');if(!response.ok)throw Error('La liste de compétences manque.');
- const skills=await response.json();const catalogResponse=await fetch('./equipment-catalog.json');if(!catalogResponse.ok)throw Error('Le catalogue d’équipement manque.');const catalog=await catalogResponse.json();const byId=new Map(catalog.map(i=>[i.id,i]));const enriched={...profile,equipment:(profile.equipment||[]).map(i=>({...i,...(byId.get(i.id)||{})}))};const data=prepareData(enriched,skills);
+ const skills=await response.json();const catalogResponse=await fetch('./equipment-catalog.json');if(!catalogResponse.ok)throw Error('Le catalogue d’équipement manque.');const catalog=catalogForProfile(await catalogResponse.json(),profile);const byId=new Map(catalog.map(i=>[i.id,i]));const enriched={...profile,equipment:(profile.equipment||[]).filter(i=>byId.has(i.id)).map(i=>({...i,...byId.get(i.id)}))};const data=prepareData(enriched,skills);
  let weaponIndex=0,worn=defaultArmorIndices(data.equipment.armor);
  function selection(){return withEffects(data,weaponIndex,worn);}
  function summary(){const fx=selection().effect;const mods=['COU','INT','CHA','AD','FOR'].filter(k=>fx.modifiers[k]).map(k=>`${k} ${fx.altered[k]} (${fx.modifiers[k]>0?'+':''}${fx.modifiers[k]})`);return `<strong>Valeurs avec le matériel porté :</strong> ${mods.map(esc).join(' · ')||'Aucune caractéristique modifiée'} · AT ${fx.attack} · PRD ${fx.parry} · PR du matériel ${fx.basePr}.${fx.unknownPr.length?` <span class="equipment-error">PR à confirmer pour : ${fx.unknownPr.map(i=>esc(i.name)).join(', ')}.</span>`:''}${fx.limitExceeded?`<p class="equipment-error">La PR portée (${fx.basePr}) dépasse la limite du profil (${fx.prLimit}).</p>`:''}${fx.conflicts.length?`<p class="equipment-error">Protections superposées : ${fx.conflicts.map(esc).join(' ; ')}. Décochez l’une des pièces avant le téléchargement.</p>`:''}`;}
