@@ -19,7 +19,7 @@ Les emplacements du modèle original sont en nombre limité. Les entrées dépas
 
 ## Catalogue
 
-- Choix explicite Épée, Sabre ou Rapière pour les quatre entrées regroupées ; nom exact repris au panier et au PDF. Prix et effets inchangés.
+- Choix explicite Épée, Sabre ou Rapière pour les quatre entrées regroupées ; choix Marteau ou Masse pour les cinq entrées regroupées correspondantes, dont l’arme d’artisan nain. Le nom exact est repris au panier et au PDF. Prix, effets et restrictions de taille inchangés. Les armes nommées explicitement restent telles quelles.
 - Dégâts, PR, modificateurs et rupture présentés en blocs distincts. Les précisions complètes du tableau restent consultables.
 - Rupture affichée sous la forme « Rupt: 1 à x » lorsque le tableau indique une plage de rupture.
 - PR absente d’une protection : PR 0.
@@ -31,3 +31,9 @@ Les emplacements du modèle original sont en nombre limité. Les entrées dépas
 Tests des actions d’ajout/retrait du panier, regroupement des quantités et conservation des variantes d’armes ; contrôle des destinations du matériel et de la PR 0 ; génération d’une fiche classique remplie ; contrôle des champs PDF interactifs et de leurs apparences ; rendu et inspection des deux premières pages.
 
 Le rendu interactif dans un navigateur n’a pas été testé dans cet environnement. Aucun fichier n’a été envoyé directement dans le dépôt GitHub : l’archive doit y être importée.
+
+## Modificateurs des objets
+
+Les autres objets portés ou utilisés (accessoires, bijoux, vêtements, etc.) contribuent également aux caractéristiques modifiées, à l’attaque et à la parade, dans les deux modèles PDF. Sur la page de préparation du PDF, des cases permettent de désactiver les effets des objets simplement transportés. Les valeurs initiales sont conservées dans les cases d’origine ; les valeurs modifiées sont inscrites à côté.
+
+Les effets conditionnels, les bonus à un jet précis et les consommables non utilisés restent décrits dans les effets des objets et dans l’annexe ; ils ne sont pas traités comme des bonus permanents.

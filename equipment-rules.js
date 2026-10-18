@@ -39,9 +39,21 @@ export function catalogForProfile(items,profile){
  return allowed.map(item=>item.kind==='armor'&&item.pr==null?{...item,pr:0}:item);
 }
 
+export function weaponForms(item){
+ const name=item?.name||'';
+ if(/^Épée, rapière, sabre 1 main\b/.test(name))return ['Épée','Sabre','Rapière'];
+ if(/^Marteau, masse\b/.test(name))return ['Marteau','Masse'];
+ return [];
+}
 export function resolveEquipmentItem(saved,catalog){
  const base=catalog.get(saved.baseId||saved.id);if(!base)return null;
- if(saved.baseId&&['Épée','Sabre','Rapière'].includes(saved.weaponForm)&&/^Épée, rapière, sabre 1 main\b/.test(base.name))return {...base,id:saved.id,baseId:base.id,weaponForm:saved.weaponForm,name:weaponChoiceName(base,saved.weaponForm)};
+ if(saved.baseId&&weaponForms(base).includes(saved.weaponForm))return {...base,id:saved.id,baseId:base.id,weaponForm:saved.weaponForm,name:weaponChoiceName(base,saved.weaponForm)};
  return {...saved,...base};
 }
-export function weaponChoiceName(base,form){const quality=base.name.replace(/^Épée, rapière, sabre 1 main\s*/, '');const suffix=quality==='correcte'?'de qualité correcte':quality==='bonne qualité'?'de bonne qualité':quality;return form+' à une main '+suffix;}
+export function weaponChoiceName(base,form){
+ if(!weaponForms(base).includes(form))return base.name;
+ if(/^Marteau, masse d.artisan nain/.test(base.name))return base.name.replace(/^Marteau, masse/,form);
+ const quality=base.name.replace(/^(?:Épée, rapière, sabre|Marteau, masse) 1 main\s*/, '');
+ const suffix=quality==='correcte'?'de qualité correcte':quality==='bonne qualité'?'de bonne qualité':quality;
+ return form+' à une main '+suffix;
+}
