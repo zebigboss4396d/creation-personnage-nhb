@@ -12,7 +12,7 @@ Les sources PDF ont servi à établir les règles mais ne sont pas incluses dans
 
 ## Catalogue de départ
 
-La page 3 présente Armes, Protections et Divers. Le rayon Prêtres et Paladins apparaît uniquement pour ces deux métiers ; Mages et Sorciers apparaît uniquement pour le métier Mage / Sorcier. Un prêtre ou paladin de Niourgl dispose d’un onglet NIOURGL distinct, qui contient les ingrédients, préparations et équipements de son culte. Les quatre profils hobbits non officiels gardent leur catalogue CAMHiF, sans ajout de manuel générique.
+La page 3 présente Armes, Protections et Divers. Le rayon Prêtres et Paladins apparaît uniquement pour ces deux métiers ; Mages et Sorciers apparaît uniquement pour le métier Mage / Sorcier. Un prêtre ou paladin de Niourgl dispose d’un onglet NIOURGL distinct, qui contient les ingrédients, préparations et équipements de son culte. Les robes, bagues, bâtons et autres objets nommément liés à Tzinntch sont réservés au Mage / Sorcier ayant choisi Magie noire de Tzinntch. Les quatre profils hobbits non officiels gardent leur catalogue CAMHiF, sans ajout de manuel générique.
 
 Les sous-catégories et les provenances des menus déroulants sont classées alphabétiquement. Les articles et le panier sont classés par prix croissant, puis par nom en cas d’égalité. Le prix maximal par objet est de 200 PO inclus, ou de 360 PO inclus pour le Bourgeois / Noble. Le budget total reste trois fois la fortune de départ. Les objets devenus indisponibles sont retirés d’un ancien panier lors du chargement de la page 3.
 
