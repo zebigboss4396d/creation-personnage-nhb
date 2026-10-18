@@ -1,5 +1,7 @@
-import {catalogForProfile} from './equipment-rules.js';
+import {groupEquipment,quantityName} from './equipment-quantities.js';
+import {catalogForProfile,resolveEquipmentItem} from './equipment-rules.js';
 import {equipmentKind} from './equipment-categories.js';
+import {routeEquipment,armorOrder} from './equipment-routing.js';
 import {ORIGIN_DETAILS,BEAST_DETAILS,JOB_DETAILS} from './creation-details.js';
 import {SENSES} from './creation-rules.js';
 import {computeEquipmentEffects,defaultArmorIndices,armorLocations,parseEquipmentEffect} from './equipment-effects.js';
@@ -16,7 +18,8 @@ export function prepareData(c,skillCatalog={}){
  const detail=[...(ORIGIN_DETAILS[c.origin?.startsWith('Homme-bête')?'Homme-bête':c.origin]||[]),...(BEAST_DETAILS[c.origin]?.notes||[]),...(JOB_DETAILS[c.job]||[]),...(c.creationNotes||[])];
  const affinity=c.affiliation||(/Picrate|Jord.hun/.test(c.origin)?c.origin.match(/Picrate|Jord.hun/)?.[0]:'')||'';
  const sense=SENSES[c.origin?.startsWith('Homme-bête')?'Homme-bête':c.origin]||{};
- const items=Array.isArray(c.equipment)?c.equipment:[];
+ const sourceItems=Array.isArray(c.equipment)?c.equipment.map(i=>equipmentKind(i)==='armor'&&i.pr==null?{...i,pr:0}:i):[];
+ const items=groupEquipment(sourceItems).map(i=>({...i,originalName:i.name,name:quantityName(i)}));
  const pc=items.reduce((total,i)=>total+(Number(i.pricePc)||0),0);
  const money=pc=>`${(pc/100).toLocaleString('fr-FR',{maximumFractionDigits:2})} PO`;
  const values={magphys:ceil((s.INT+s.AD)/2),magpsy:ceil((s.INT+s.CHA)/2),resmag:ceil((s.COU+s.INT+s.FOR)/3),esquive:s.AD,inge:ceil((s.INT+s.AD)/2),pres:ceil((s.AD+s.CHA)/2),perc:s.INT,impact:(s.FOR>12?s.FOR-12:s.FOR<=8?-1:0)+(Number(c.choices?.ogreAt)||0)+(Number(c.choices?.ogrePrd)||0)};
@@ -26,7 +29,7 @@ export function prepareData(c,skillCatalog={}){
  const choiceLabels={warriorBonus:'Guerrier : point supplémentaire en',warriorTrade:'Guerrier : échange AT / PRD',warriorTechnique:'Coup spécial',tradeFrom:'Point retiré à',tradeTo:'Point ajouté à',rangerFrom:'Ranger : point retiré à',rangerTo:'Ranger : point ajouté à',ogreAt:'Ogre : AT convertis en dégâts',ogrePrd:'Ogre : PRD convertis en dégâts',address:'Bonus / malus d’Adresse appliqué à'};const choices=Object.entries(c.choices||{}).filter(([k,v])=>v!=null&&v!==''&&v!=='aucun'&&v!=='0').map(([k,v])=>`${choiceLabels[k]||k} : ${v}`);
  const night=sense.nuit==='totale'?String(s.INT):sense.nuit==='partielle'?String(s.INT-4):sense.nuit==='moyenne'?'valeur à confirmer avec le MJ':String(ceil(s.INT/2));const modifiers=[`Vue : ${s.INT+(sense.vue||0)} · Ouïe : ${s.INT+(sense.ouie||0)} · Odorat : ${s.INT+(sense.odorat||0)}`,`Nyctalopie : ${sense.nuit||'aucune'} · Perception de nuit : ${night} · Perception de base : ${s.INT}`];
  const groups=[['Caractéristiques et valeurs',basics],['Choix de création',[c.allocation?`Répartition des tirages : ${c.allocation}`:'',...choices,affinity?`Spécialité ou divinité : ${affinity}`:'Aucune spécialité ou divinité choisie',c.affiliationNote||''].filter(Boolean)],['Compétences de naissance et choisies',skills.length?skills:['Aucune compétence enregistrée']],['Perception et conditions',modifiers],['Avantages et restrictions du profil',detail.length?detail:['Consulter les manuels du profil et du métier']],['Paquetage retenu',items.length?items.map(i=>`${normalize(i.name)} · ${money(i.pricePc||0)}${i.source?.startsWith('Fernol')?' · prix régional provisoire':''}`):['Aucun objet sélectionné']]];
- return {...c,skills,detail,affinity,values,equipment,items,pc,money,groups};
+ equipment.armor.sort(armorOrder);return {...c,skills,detail,affinity,values,equipment,items,pc,money,groups,routed:routeEquipment(items)};
 }
 function withEffects(data,weaponIndex=0,armorIndices=defaultArmorIndices(data.equipment.armor)){
  const effect=computeEquipmentEffects(data,weaponIndex,armorIndices);const limits=data.detail.map(t=>String(t).match(/(?:PR d[’']armure|armure limitée à PR)\s*(\d+)/i)).filter(Boolean).map(m=>Number(m[1]));const baseLimit=limits.length?Math.min(...limits):null;effect.prLimit=baseLimit===null?null:baseLimit+(data.job==='Guerrier / Gladiateur'?1:0);effect.limitExceeded=effect.prLimit!==null&&effect.basePr>effect.prLimit;
@@ -65,11 +68,14 @@ function fillInteractive(form,d){
 }
 function fillClassic(form,d){
  const s=d.stats,v=d.values,e=d.equipment,fx=d.effect;
- const map={Nom:d.name,Origine:d.origin,'Métiers':d.job||'Sans métier',Niveau:1,'EV-PV MAX':d.ev,PV1:d.ev,'EA-PA Max':d.ea,PA1:d.ea,'Points de destin':d.destiny,MagiePhys:v.magphys,MagiePsy:v.magpsy,ResitMagie:v.resmag,OR:d.gold,COU:s.COU,INT:s.INT,CHA:s.CHA,AD:s.AD,FO:s.FOR,Attaque:d.at,Attaque1:d.at,Parade:d.prd,Parrade1:d.prd,Experience:0,Competences:d.skills[0]||'',Competences1:d.skills[1]||'',Competences2:d.skills[2]||'',Competences3:d.skills[3]||'',Competences4:d.skills[4]||'',Competences5:d.skills[5]||'',Competences6:d.skills[6]||'',Competences7:d.skills[7]||'',Competences8:d.skills[8]||'',Competences9:d.skills[9]||'',Competences10:d.skills[10]||'',Competences11:d.skills[11]||'',ArmePrincipale:e.weapons[0]?.name||'',ArmeSecondaire:e.weapons[1]?.name||'',ArmeSupplementaire:e.weapons[2]?.name||'',Tente:d.items.find(i=>/tente/i.test(i.name))?.name||'',Matelas:d.items.find(i=>/matelas/i.test(i.name))?.name||'',Couverture:d.items.find(i=>/couverture/i.test(i.name))?.name||'',Sac:e.bags[0]?.name||'',Besace:e.bags[1]?.name||'',Bourse:d.items.find(i=>/bourse/i.test(i.name))?.name||'', 'Machins Precieux':d.affinity?`Spécialité ou culte : ${d.affinity}`:''};
+ const map={Nom:d.name,Origine:d.origin,'Métiers':d.job||'Sans métier',Niveau:1,'EV-PV MAX':d.ev,PV1:d.ev,'EA-PA Max':d.ea,PA1:d.ea,'Points de destin':d.destiny,MagiePhys:v.magphys,MagiePsy:v.magpsy,ResitMagie:v.resmag,OR:d.gold,COU:s.COU,INT:s.INT,CHA:s.CHA,AD:s.AD,FO:s.FOR,Attaque:d.at,Attaque1:d.at,Parade:d.prd,Parrade1:d.prd,Experience:0,Competences:d.skills[0]||'',Competences1:d.skills[1]||'',Competences2:d.skills[2]||'',Competences3:d.skills[3]||'',Competences4:d.skills[4]||'',Competences5:d.skills[5]||'',Competences6:d.skills[6]||'',Competences7:d.skills[7]||'',Competences8:d.skills[8]||'',Competences9:d.skills[9]||'',Competences10:d.skills[10]||'',Competences11:d.skills[11]||'',ArmePrincipale:e.weapons[0]?.name||'',ArmeSecondaire:e.weapons[1]?.name||'',ArmeSupplementaire:e.weapons[2]?.name||'',Tente:(d.routed.tents||[]).map(i=>i.name).join(' ; '),Matelas:(d.routed.mattresses||[]).map(i=>i.name).join(' ; '),Couverture:(d.routed.blankets||[]).map(i=>i.name).join(' ; '),Sac:(d.routed.backpacks||[]).map(i=>i.name).join(' ; '),Besace:(d.routed.satchels||[]).map(i=>i.name).join(' ; '),Bourse:d.routed.purses?.[0]?.name||'',Bourse2:(d.routed.purses||[]).slice(1).map(i=>i.name).join(' ; '),Autre:(d.routed.containers||[]).map(i=>i.name).join(' ; ')};
  e.armor.slice(0,7).forEach((i,n)=>map[`Armures et proctections ${n+1}`]=i.name);
  e.food.slice(0,7).forEach((i,n)=>map[['Bouffe','Bouffe1','Bouffe2','Bouffe3','Bouffe4','Bouffe5','Bouffe6'][n]]=i.name);
  [...e.potions,...e.poisons].slice(0,7).forEach((i,n)=>map[['Doses','Doses2','Doses3','Doses4','Doses5','Doses6','Doses7'][n]]=i.name);
- d.items.filter(i=>!e.armor.includes(i)&&!e.weapons.includes(i)&&!e.food.includes(i)).slice(0,6).forEach((i,n)=>map[['Objets speciaux','Objets speciaux2','Objets speciaux3','Objets speciaux4','Objets speciaux5','Objets speciaux6'][n]]=i.name);
+ (d.routed.special||[]).slice(0,6).forEach((i,n)=>{const suffix=n?String(n+1):'';map['Objets speciaux'+suffix]=i.name;map['Objets speciaux effets'+suffix]=i.notes||'';});
+ (d.routed.mounts||[]).slice(0,4).forEach((i,n)=>map['Machins Precieux'+(n?String(n+1):'')]=i.name);
+ (d.routed.camping||[]).slice(0,7).forEach((i,n)=>map[n?'Text'+(n+1):'Text']=i.name);
+
  for(const [name,value] of Object.entries(map))if(value!==undefined)textField(form,name,value,95);
  for(const [key,field] of Object.entries({COU:'cou1',INT:'INT1',CHA:'CHA1',AD:'AD1',FOR:'FO1'}))if(fx.modifiers[key])textField(form,field,fx.altered[key]);
  textField(form,'Attaque1',fx.attack);textField(form,'Parrade1',fx.parry);
@@ -79,7 +85,11 @@ function fillClassic(form,d){
   textField(form,`PI${n}`,effect.damage,20);textField(form,`RupArme${n}`,effect.rupture,20);
   if(index>0){const armorAt=fx.modifiers.AT-(fx.weapon?fx.perItem.get(fx.weapon).mods.AT:0),armorPrd=fx.modifiers.PRD-(fx.weapon?fx.perItem.get(fx.weapon).mods.PRD:0);textField(form,`Attaque${n}`,Number(d.at)+armorAt+effect.mods.AT);textField(form,`Parrade${n}`,Number(d.prd)+armorPrd+effect.mods.PRD);}
  });
- e.armor.slice(0,7).forEach((i,n)=>{const effect=fx.perItem.get(i);textField(form,`Armures et proctections ${n+1}`,`${i.name}${effect.summary?' ('+effect.summary+')':''}${fx.selected.includes(i)?'':' [non porté]'}`,90);textField(form,`RupArmures${n+1}`,effect.rupture,20);});
+ const ammoSlots=['ArmePrincipale','ArmeSecondaire','ArmeSupplementaire'].slice(weapons.length);
+ e.munitions.slice(0,ammoSlots.length).forEach((i,n)=>textField(form,ammoSlots[n],'Munitions : '+i.name,100));
+ const armorAndClothes=[...e.armor,...(d.routed.clothes||[])];
+ armorAndClothes.slice(0,7).forEach((i,n)=>{const effect=fx.perItem.get(i)||parseEquipmentEffect(i),isArmor=e.armor.includes(i);textField(form,`Armures et proctections ${n+1}`,`${i.name}${isArmor?' · PR '+i.pr:''}${effect.summary?' ('+effect.summary+')':''}${isArmor&&!fx.selected.includes(i)?' [non porté]':''}`,110);textField(form,`RupArmures${n+1}`,effect.rupture,20);});
+
  const locations=Object.fromEntries(['tête','bras','bouclier','torse','mains','jambes','pieds'].map(k=>[k,0]));
  for(const i of fx.selected)for(const loc of armorLocations(i))locations[loc]+=Number(i.pr)||0;
  for(const [loc,field] of Object.entries({'tête':'Tete','bras':'Bras','bouclier':'Bouclier','torse':'Torse','mains':'Mains','jambes':'Jambes','pieds':'Pieds'}))if(locations[loc])textField(form,field,locations[loc]);
@@ -113,7 +123,7 @@ export async function buildPdf(kind,d,template){
 async function init(){
  if(!window.PDFLib)throw Error('Le module PDF est manquant. Ajoutez pdf-lib.min.js au dépôt.');
  const response=await fetch('./skills.json');if(!response.ok)throw Error('La liste de compétences manque.');
- const skills=await response.json();const catalogResponse=await fetch('./equipment-catalog.json');if(!catalogResponse.ok)throw Error('Le catalogue d’équipement manque.');const catalog=catalogForProfile(await catalogResponse.json(),profile);const byId=new Map(catalog.map(i=>[i.id,i]));const enriched={...profile,equipment:(profile.equipment||[]).filter(i=>byId.has(i.id)).map(i=>({...i,...byId.get(i.id)}))};const data=prepareData(enriched,skills);
+ const skills=await response.json();const catalogResponse=await fetch('./equipment-catalog.json');if(!catalogResponse.ok)throw Error('Le catalogue d’équipement manque.');const catalog=catalogForProfile(await catalogResponse.json(),profile);const byId=new Map(catalog.map(i=>[i.id,i]));const enriched={...profile,equipment:(profile.equipment||[]).map(i=>resolveEquipmentItem(i,byId)).filter(Boolean)};const data=prepareData(enriched,skills);
  let weaponIndex=0,worn=defaultArmorIndices(data.equipment.armor);
  function selection(){return withEffects(data,weaponIndex,worn);}
  function summary(){const fx=selection().effect;const mods=['COU','INT','CHA','AD','FOR'].filter(k=>fx.modifiers[k]).map(k=>`${k} ${fx.altered[k]} (${fx.modifiers[k]>0?'+':''}${fx.modifiers[k]})`);return `<strong>Valeurs avec le matériel porté :</strong> ${mods.map(esc).join(' · ')||'Aucune caractéristique modifiée'} · AT ${fx.attack} · PRD ${fx.parry} · PR du matériel ${fx.basePr}.${fx.unknownPr.length?` <span class="equipment-error">PR à confirmer pour : ${fx.unknownPr.map(i=>esc(i.name)).join(', ')}.</span>`:''}${fx.limitExceeded?`<p class="equipment-error">La PR portée (${fx.basePr}) dépasse la limite du profil (${fx.prLimit}).</p>`:''}${fx.conflicts.length?`<p class="equipment-error">Protections superposées : ${fx.conflicts.map(esc).join(' ; ')}. Décochez l’une des pièces avant le téléchargement.</p>`:''}`;}

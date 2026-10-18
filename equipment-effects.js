@@ -55,3 +55,5 @@ export function computeEquipmentEffects(data,selectedWeapon=0,worn=defaultArmorI
  const unknownPr=selected.filter(i=>i.pr===undefined||i.pr===null);
  return {weapon,selected,selectedWeapon,worn,modifiers,altered,attack,parry,basePr,unknownPr,conflicts,perItem};
 }
+
+export function ruptureLabel(item){const r=parseEquipmentEffect(item).rupture;return r?'Rupt: 1 à '+r.split(' à ').pop():/incassable/i.test(item.notes||'')?'Rupt: incassable':'';}

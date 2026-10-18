@@ -20,12 +20,14 @@ export function startingManual(profile){
  const choices=mage?MAGIC_DISCIPLINES:profile.job==='Prêtre'?PRIEST_DEITIES:PALADIN_DEITIES;
  if(!choices.some(choice=>normalized(choice.name).trim()===normalized(profile.affiliation).trim()))return null;
  const slug=normalized(profile.affiliation).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
- return {id:`manuel-depart-${mage?'mage':'divin'}-${slug}`,name:mage?`Grimoire des Ordres Néfastes — ${profile.affiliation} — niveau 1`:`Prodiges des Novices de ${profile.affiliation} — niveaux 1 à 3`,pricePc:0,currency:'PO',kind:'book',category:mage?'Mages et Sorciers':'Prêtres et Paladins',section:mage?'Grimoire de spécialité · Niveau 1':'Prodiges des Novices · Niveaux 1 à 3',catalog:'standard',source:'Manuel de départ gratuit',notes:'Manuel nécessaire à l’apprentissage de votre spécialité ou de votre culte. Offert à la création, sans dépense du budget d’équipement.',unique:true};
+ return {id:`manuel-depart-${mage?'mage':'divin'}-${slug}`,name:mage?`Grimoire des Ordres Néfastes — ${profile.affiliation} — niveau 1`:`Prodiges des Novices de ${profile.affiliation} — niveaux 1 à 3`,pricePc:0,currency:'PO',kind:'book',category:mage?'Mages et Sorciers':'Prêtres et Paladins',section:mage?'Livres de sorcellerie':'Livre du culte',catalog:'standard',source:'Manuel de départ gratuit',notes:'Manuel nécessaire à l’apprentissage de votre spécialité ou de votre culte. Offert à la création, sans dépense du budget d’équipement.',unique:true};
 }
 export function catalogForProfile(items,profile){
  const tabs=equipmentTabs(profile),limit=equipmentPriceLimit(profile),moote=isMooteProfile(profile);
  const allowed=items.filter(item=>{
   if(item.starterAvailable===false||item.pricePc>limit)return false;
+  if(item.section==='Livres ordinaires et connaissances')return false;
+  if(['Reliques et objets de culte','Bagues, médaillons et accessoires divins'].includes(item.section))return false;
   if(/tzinntch/i.test(item.name||'')&&!isTzinntchMage(profile))return false;
   if(item.catalog==='camhif')return moote;
   // Les autres livres des rayons de magie et de culte ne sont pas proposés au départ.
@@ -34,5 +36,12 @@ export function catalogForProfile(items,profile){
  });
  const manual=startingManual(profile);
  if(manual)allowed.push(manual);
- return allowed;
+ return allowed.map(item=>item.kind==='armor'&&item.pr==null?{...item,pr:0}:item);
 }
+
+export function resolveEquipmentItem(saved,catalog){
+ const base=catalog.get(saved.baseId||saved.id);if(!base)return null;
+ if(saved.baseId&&['Épée','Sabre','Rapière'].includes(saved.weaponForm)&&/^Épée, rapière, sabre 1 main\b/.test(base.name))return {...base,id:saved.id,baseId:base.id,weaponForm:saved.weaponForm,name:weaponChoiceName(base,saved.weaponForm)};
+ return {...saved,...base};
+}
+export function weaponChoiceName(base,form){const quality=base.name.replace(/^Épée, rapière, sabre 1 main\s*/, '');const suffix=quality==='correcte'?'de qualité correcte':quality==='bonne qualité'?'de bonne qualité':quality;return form+' à une main '+suffix;}
