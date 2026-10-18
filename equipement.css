@@ -31,3 +31,15 @@
   .equipment-item .item-right button{width:100%}
 }
 @media print{.cart-toggle,.cart-close,.equipment-more{display:none!important}.equipment-cart{display:block!important;position:static!important;overflow:visible!important;max-height:none!important}}
+
+/* Cinq familles ; les sous-catégories et la provenance restent compactes. */
+.equipment-filters{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:12px;margin:12px 0}
+.equipment-filters .wizard-field{margin:0;min-width:0;font-size:.9rem}
+.equipment-filters select{width:100%;max-width:100%;font-size:16px;min-height:46px;padding:10px 8px}
+.catalog-label{display:inline-block;border:1px solid #b79570;border-radius:5px;padding:1px 5px;margin:0 4px 3px 0;font-weight:750;background:#f1e1c6;color:#664126}
+.equipment-tabs{gap:6px}
+.equipment-tab{padding:10px 12px;font-size:.9rem}
+@media(max-width:520px){.equipment-filters{grid-template-columns:1fr}.equipment-tabs{margin-bottom:10px}.equipment-tab{min-height:46px}.equipment-info{overflow-wrap:anywhere}}
+.equipment-details{font-size:.82rem;color:#664b35;margin-top:7px;max-width:100%}
+.equipment-details summary{cursor:pointer;font-weight:750;padding:7px 0;min-height:36px}
+.equipment-details p{margin:4px 0;line-height:1.5;overflow-wrap:anywhere}
