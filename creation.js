@@ -1,14 +1,16 @@
+import {characterStorage} from './character-storage.js';
 import {ORDER,origins,beasts,jobs,isEligible,compatible} from './data.js';
 import {SENSES,WARRIOR_TECHNIQUES,isWarrior,isEngineer,isMerchant,isRanger,needsMagic,needsDeity,adjustedValues,perception} from './creation-rules.js';
 import {ORIGIN_DETAILS,BEAST_DETAILS,JOB_DETAILS} from './creation-details.js';
 import {MAGIC_DISCIPLINES,PRIEST_DEITIES,PALADIN_DEITIES,DIVINE_DETAILS} from './affiliations.js';
 
+import {skillOptions,skillKey,uniqueSkills} from './skill-rules.js';
 const $=s=>document.querySelector(s);
 const skillData=await fetch('./skills.json').then(r=>r.json());
 const hints=await fetch('./skill-hints.json').then(r=>r.json());
 const generic=await fetch('./generic-skills.json').then(r=>r.json());
 const labels=['Derniers ajustements','Compétences de niveau 1','Spécialité ou divinité','Fortune et destin','Identité et pré-fiche'];
-const stored=JSON.parse(sessionStorage.getItem('naheul-selection')||'null');
+const stored=JSON.parse(characterStorage.getItem('naheul-selection')||'null');
 const expanded=origins.flatMap(o=>o.beast?[o,...beasts.map((b,i)=>({...o,name:`Homme-bête · ${b.name}`,ev:b.ev,beastDelta:b.delta,beastIndex:i+1}))]:o);
 let origin=expanded.find(o=>o.name===stored?.origin);
 let job=jobs.find(j=>j.name===stored?.job)||null;
@@ -19,9 +21,11 @@ if(!origin||!validStats||stored.job&&!job){
 }else{
  let base={...stored.stats};
  if(origin.beastDelta)for(const [key,delta] of Object.entries(origin.beastDelta))base[key]+=delta;
- const previous=JSON.parse(sessionStorage.getItem('naheul-draft')||'null');
+ const previous=JSON.parse(characterStorage.getItem('naheul-draft')||'null');
  const signature=JSON.stringify(stored);
- const draft=previous?.signature===signature?previous:{signature,step:0,choices:{},skills:[],gold:'',destiny:'',deity:'',magic:'',name:'',sex:''};
+ let previousSelection;try{previousSelection=JSON.parse(previous?.signature||'null');}catch{}
+ const sameArchetype=previousSelection?.origin===stored.origin&&previousSelection?.job===stored.job;
+ const draft=previous?.signature===signature?previous:sameArchetype?{...previous,signature,step:stored.origin==='Homme-bête'?-1:0}:{signature,step:0,choices:{},skills:[],gold:'',destiny:'',deity:'',magic:'',name:'',sex:''};
  if(draft.sex&&!['Masculin','Féminin'].includes(draft.sex))draft.sex='';
  let step=Math.min(4,Math.max(stored.origin==='Homme-bête'?-1:0,Number(draft.step)||0));
  const isBeast=stored.origin==='Homme-bête';
@@ -39,26 +43,15 @@ if(!origin||!validStats||stored.job&&!job){
  }
  if(isBeast&&!applyBeast())step=-1;
  const clean=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const key=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]/g,'').toLowerCase();
- const unique=names=>[...new Map(names.map(s=>[key(s),s])).values()];
+ const key=skillKey;
+ const unique=uniqueSkills;
  const statsHtml=s=>ORDER.map(k=>`<span>${k} <strong>${s[k]}</strong></span>`).join('');
  const val=()=>adjustedValues(base,origin,job,draft.choices,draft.magic);
- const save=()=>{draft.step=step;sessionStorage.setItem('naheul-draft',JSON.stringify(draft));};
- const select=(id,label,options,value,placeholder='Choisissez…')=>`<label class="wizard-field">${clean(label)}<select id="${id}"><option value="">${clean(placeholder)}</option>${options.map(([v,t])=>`<option value="${clean(v)}" ${value===v?'selected':''}>${clean(t)}</option>`).join('')}</select></label>`;
+ const save=()=>{draft.step=step;characterStorage.setItem('naheul-draft',JSON.stringify(draft));};
+ const select=(id,label,options,value,placeholder='Choisissez…')=>`<label class="wizard-field">${clean(label)}<select id="${id}"><option value="">${clean(placeholder)}</option>${[...options].sort((a,b)=>a[1].localeCompare(b[1],'fr')).map(([v,t])=>`<option value="${clean(v)}" ${value===v?'selected':''}>${clean(t)}</option>`).join('')}</select></label>`;
  const choices=(arr)=>arr.map(n=>[n,n]);
  const numeric=(v)=>v===''?'À tirer':v;
- function sourceSkills(){
-  const o=skillData[origin.beastDelta?'Homme-bête':origin.name]||{born:[],choices:[]};
-  const j=job?skillData[job.name]||{born:[],choices:[]}:{born:[],choices:[]};
-  const born=unique([...o.born,...(BEAST_DETAILS[origin.name]?.born||[]),...j.born]);
-  const skip=new Set(born.map(key));
-  const exclude=list=>unique(list).filter(s=>!skip.has(key(s))&&key(s)!=='appeldusauvage'&&(!(job?.magic)||key(s)!=='tetevide'));
-  const all=exclude(generic);
-  if(origin.name==='Humain')return {born,groups:job?[{label:'Deux compétences du métier',quota:2,skills:exclude(job.name==='Sbire'?all:j.choices)},{label:'Une compétence générique',quota:1,skills:all}]:[{label:'Trois compétences génériques',quota:3,skills:all}]};
-  if(origin.bundle)return {born,groups:[{label:'Compétences du profil',quota:2,skills:exclude(o.choices)}]};
-  if(job?.name==='Sbire')return {born,groups:[{label:'Deux compétences au choix',quota:2,skills:exclude([...o.choices,...generic].filter(s=>!['chefdegroupe','chercherdesnoises'].includes(key(s))))}]};
-  return {born,groups:[{label:'Deux compétences parmi l’origine et le métier',quota:2,skills:exclude([...o.choices,...j.choices])}]};
- }
+ function sourceSkills(){return skillOptions(origin.name,job,base,skillData,generic,BEAST_DETAILS[origin.name]?.born||[],origin.bundle);}
  function selectedNames(){
   const groups=sourceSkills().groups;
   return draft.skills.map(token=>{const [group,id]=token.split(':');return groups[Number(group)]?.skills.find(s=>key(s)===id);}).filter(Boolean);
@@ -101,7 +94,7 @@ if(!origin||!validStats||stored.job&&!job){
   const current=magic?draft.magic:draft.deity;
   return `<p class="wizard-question-intro">${magic?'Choisissez une discipline de magie pour commencer votre carrière. Les sorts généralistes sont généralement accessibles en plus, sauf règles particulières.':'Choisissez une seule divinité. Les pouvoirs et obligations dépendent de son manuel.'}</p>${select('affiliation',magic?'Spécialité magique':'Divinité servie',catalog.map(x=>[x.name,x.name]),current)}${current?`<p class="wizard-note">${clean(catalog.find(x=>x.name===current)?.description||'')}</p>`:''}`;
  }
- function fortuneQuestion(){return `<p class="wizard-question-intro">Fortune : 2D6 × 10 PO. Destin : 1D4 − 1 PD. Vous pouvez saisir vos propres résultats ou lancer les dés ici.</p>${job?.name==='Bourgeois / Noble'?'<p class="wizard-note">Bourgeois / Noble : un second tirage de fortune s’ajoute au premier.</p>':''}${origin.name==='Semi-homme de la Loi'?'<p class="wizard-note">Votre fiche de supplément indique 300 PO de départ : ce montant est prérempli et reste modifiable si votre MJ applique une autre règle.</p>':''}<div class="wizard-field-row"><label class="wizard-field">Pièces d’or (PO)<input id="gold" type="number" min="0" step="1" inputmode="numeric" value="${clean(draft.gold)}"><small>La page 3 accorde un budget d’équipement égal à trois fois ce montant ; ces PO restent ensuite au personnage.</small></label><label class="wizard-field">Points de Destin (PD)<input id="destiny" type="number" min="0" max="3" step="1" inputmode="numeric" value="${clean(draft.destiny)}"><small>Résultat compris entre 0 et 3.</small></label></div><div class="roll-actions"><button type="button" data-roll="gold">Lancer les dés pour les PO</button><button type="button" data-roll="destiny">Lancer le D4 pour les PD</button></div>`}
+ function fortuneQuestion(){return `<p class="wizard-question-intro">Fortune : 2D6 × 10 PO. Destin : 1D4 − 1 PD. Vous pouvez saisir vos propres résultats ou lancer les dés ici.</p>${job?.name==='Bourgeois / Noble'?'<p class="wizard-note">Bourgeois / Noble : un second tirage de fortune s’ajoute au premier.</p>':''}${selectedNames().some(s=>key(s)==='tirelaine')?'<p class="wizard-note">Tire-laine : le tirage automatique ajoute 1D20 PO. En saisie manuelle, incluez ce bonus dans votre montant.</p>':''}${origin.name==='Semi-homme de la Loi'?'<p class="wizard-note">Votre fiche de supplément indique 300 PO de départ : ce montant est prérempli et reste modifiable si votre MJ applique une autre règle.</p>':''}<div class="wizard-field-row"><label class="wizard-field">Pièces d’or (PO)<input id="gold" type="number" min="0" step="1" inputmode="numeric" value="${clean(draft.gold)}"><small>La page 3 accorde un budget d’équipement égal à trois fois ce montant ; ces PO restent ensuite au personnage.</small></label><label class="wizard-field">Points de Destin (PD)<input id="destiny" type="number" min="0" max="3" step="1" inputmode="numeric" value="${clean(draft.destiny)}"><small>Résultat compris entre 0 et 3.</small></label></div><div class="roll-actions"><button type="button" data-roll="gold">Lancer les dés pour les PO</button><button type="button" data-roll="destiny">Lancer le D4 pour les PD</button></div>`}
  function senseTable(v){
   const p=perception(v.stats,origin);
   const status=x=>x===2?'Excellent':x===1?'Bon':x===-1?'Mauvais':'Normal';
@@ -114,7 +107,7 @@ if(!origin||!validStats||stored.job&&!job){
  function sheet(full=false){
   const v=val(),{born}=sourceSkills(),skills=selectedNames();
   const identity=full?`<p><strong>${clean(draft.name||'Nom à renseigner')}</strong> · ${clean(draft.sex||'Sexe à choisir')}</p>`:'';
-  const stats=`<div class="stat-strip">${statsHtml(v.stats)}</div><div class="value-grid"><span><small>AT</small><strong>${v.at}</strong></span><span><small>PRD</small><strong>${v.prd}</strong></span><span><small>EV</small><strong>${v.ev??'—'}</strong></span><span><small>EA</small><strong>${v.ea??'—'}</strong></span><span><small>PO</small><strong>${numeric(draft.gold)}</strong></span><span><small>PD</small><strong>${numeric(draft.destiny)}</strong></span></div><div class="derived-grid"><span>MAGPHYS <strong>${v.magphys}</strong></span><span>MAGPSY <strong>${v.magpsy}</strong></span><span>RESMAG <strong>${v.resmag}</strong></span></div><p><strong>ESQUIVE :</strong> ${v.esquive} (AD avant équipement) · <strong>INGE :</strong> ${v.inge} · <strong>PRES :</strong> ${v.pres} · <strong>PERC :</strong> ${v.perc}.</p><p><strong>Impact :</strong> ${v.impact>=0?'+':''}${v.impact} ${v.impactExtra?'(dont +'+v.impactExtra+' converti par l’Ogre)':''} · <strong>Bonus de dégâts des sorts :</strong> +${v.spell} si applicable.</p>`;
+  const stats=`<div class="stat-strip">${statsHtml(v.stats)}</div><div class="value-grid"><span><small>AT</small><strong>${v.at}</strong></span><span><small>PRD</small><strong>${v.prd}</strong></span><span><small>EV</small><strong>${v.ev??'—'}</strong></span><span><small>EA</small><strong>${v.ea??'—'}</strong></span><span><small>PO</small><strong>${numeric(draft.gold)}</strong></span><span><small>PD</small><strong>${numeric(draft.destiny)}</strong></span></div><div class="derived-grid"><span>MAGPHYS <strong>${v.magphys}</strong></span><span>MAGPSY <strong>${v.magpsy}</strong></span><span>RESMAG <strong>${v.resmag}</strong></span></div><p><strong>ESQUIVE :</strong> ${v.esquive} (AD avant équipement) · <strong>INGE :</strong> ${v.inge} · <strong>PRES :</strong> ${v.pres} · <strong>PERC :</strong> ${v.perc}.</p><p><strong>PI :</strong> ${v.impact>=0?'+':''}${v.impact} ${v.impactExtra?'(dont +'+v.impactExtra+' converti par l’Ogre)':''} · <strong>PI magiques :</strong> +${v.spell} si applicable.</p>`;
   if(!full)return `<p class="eyebrow">APERÇU EN DIRECT</p><h2>${clean(origin.name)}</h2><p>${clean(job?.name|| (origin.bundle?'Profil complet':'Sans métier'))} · ${clean(stored.label)}</p>${stats}<p><strong>Compétences supplémentaires :</strong> ${skills.map(clean).join(' · ')||'à choisir'}</p>`;
   const options=[...Object.entries(draft.choices).filter(([k,v])=>v!==''&&v!=='aucun'&&v!=='0'&&v!=null).map(([k,v])=>`${({warriorBonus:'Bonus guerrier',warriorTrade:'Transfert guerrier',warriorTechnique:'Coup spécial',tradeFrom:'Point retiré à',tradeTo:'Point ajouté à',rangerFrom:'Ranger : retrait à',rangerTo:'Ranger : ajout à',ogreAt:'Ogre : points retirés à l’AT',ogrePrd:'Ogre : points retirés à la PRD',address:'Bonus/malus d’Adresse sur'})[k]||k} : ${v}`)];
   const notes=[origin.note,job?.note,...(ORIGIN_DETAILS[origin.beastDelta?'Homme-bête':origin.name]||[]),...(BEAST_DETAILS[origin.name]?.notes||[]),...(JOB_DETAILS[job?.name]||[])].filter(Boolean);
@@ -135,7 +128,7 @@ if(!origin||!validStats||stored.job&&!job){
   const content=[fieldChoices,skillsQuestion,affiliationQuestion,fortuneQuestion,()=>`<p class="wizard-question-intro">Indiquez le nom et le sexe du personnage, puis vérifiez sa pré-fiche avant de poursuivre.</p><div class="wizard-field-row"><label class="wizard-field">Nom du personnage<input id="character-name" type="text" maxlength="90" autocomplete="off" value="${clean(draft.name)}" placeholder="Nom du personnage"></label>${select('character-sex','Sexe',[['Féminin','Féminin'],['Masculin','Masculin']],draft.sex)}</div>${sheet(true)}`][step]();
   return `<p class="eyebrow">QUESTION ${step+1+(isBeast?1:0)} SUR ${labels.length+(isBeast?1:0)}</p><h2>${labels[step]}</h2>${content}<div class="wizard-actions"><button type="button" class="back" id="wizard-back">${step?'← Question précédente':isBeast?'← Revoir la variante':'← Changer d’archétype'}</button><button type="button" class="next" id="wizard-next">${step===labels.length-1?'Valider et passer à l’équipement →':'Continuer →'}</button></div>`;
  }
- function render(){save();if(step===-1){$('#wizard-question').innerHTML=beastQuestion();$('#wizard-preview').innerHTML=`<p class="eyebrow">HOMME-BÊTE</p><h2>Variante à tirer au D6</h2><div class="stat-strip">${statsHtml(stored.stats)}</div><p>${draft.beastRoll?`Résultat ${draft.beastRoll} : ${clean(beasts[Number(draft.beastRoll)-1]?.name||'à vérifier')}`:'Lancez le dé pour déterminer la variante, puis choisissez le métier.'}</p>`;$('#wizard-progress').textContent='1 / 6 · Variante Homme-bête';}else{$('#wizard-question').innerHTML=question();$('#wizard-preview').innerHTML=sheet();$('#wizard-progress').textContent=`${step+1+(isBeast?1:0)} / ${labels.length+(isBeast?1:0)} · ${labels[step]}`;}$('#wizard-error').hidden=true;}
+ function render(){const options=sourceSkills().groups;draft.skills=draft.skills.filter(token=>{const [g,k]=token.split(':');return options[Number(g)]?.skills.some(s=>key(s)===k);});save();if(step===-1){$('#wizard-question').innerHTML=beastQuestion();$('#wizard-preview').innerHTML=`<p class="eyebrow">HOMME-BÊTE</p><h2>Variante à tirer au D6</h2><div class="stat-strip">${statsHtml(stored.stats)}</div><p>${draft.beastRoll?`Résultat ${draft.beastRoll} : ${clean(beasts[Number(draft.beastRoll)-1]?.name||'à vérifier')}`:'Lancez le dé pour déterminer la variante, puis choisissez le métier.'}</p>`;$('#wizard-progress').textContent='1 / 6 · Variante Homme-bête';}else{$('#wizard-question').innerHTML=question();$('#wizard-preview').innerHTML=sheet();$('#wizard-progress').textContent=`${step+1+(isBeast?1:0)} / ${labels.length+(isBeast?1:0)} · ${labels[step]}`;}$('#wizard-error').hidden=true;}
  function error(message){$('#wizard-error').textContent=message;$('#wizard-error').hidden=false;$('#wizard-error').scrollIntoView({behavior:'smooth',block:'center'});}
  function check(){
   if(step===0){
@@ -157,6 +150,7 @@ if(!origin||!validStats||stored.job&&!job){
    if(needsDeity(job)&&!(job.name==='Prêtre'?PRIEST_DEITIES:PALADIN_DEITIES).some(x=>x.name===draft.deity))return 'Choisissez une divinité dans la liste.';
   }
   if(step===3){if(draft.gold===''||!Number.isInteger(Number(draft.gold))||Number(draft.gold)<0)return 'Indiquez un montant de pièces d’or entier et positif.';if(draft.destiny===''||!Number.isInteger(Number(draft.destiny))||Number(draft.destiny)<0||Number(draft.destiny)>3)return 'Indiquez un nombre de Points de Destin de 0 à 3.';}
+  if(step===4){const current=step;for(let n=0;n<4;n++){step=n;const problem=check();if(problem){step=current;return problem;}}step=current;}
   if(step===4&&!draft.name.trim())return 'Indiquez le nom du personnage.';
   if(step===4&&!['Féminin','Masculin'].includes(draft.sex))return 'Choisissez Masculin ou Féminin.';
   return '';
@@ -182,10 +176,10 @@ if(!origin||!validStats||stored.job&&!job){
   if(map[event.target.id]){draft[map[event.target.id]]=event.target.value;save();$('#wizard-preview').innerHTML=sheet();if(step===4&&$('#wizard-question .final-sheet'))$('#wizard-question .final-sheet').outerHTML=sheet(true);}
  });
  $('#wizard-question').addEventListener('click',event=>{
-  const roll=event.target.closest('[data-roll]');if(roll){if(roll.dataset.roll==='beast'){draft.beastRoll=String(die(6));draft.beastJob='';draft.choices={};draft.skills=[];draft.magic='';draft.deity='';}else if(roll.dataset.roll==='gold')draft.gold=String((die(6)+die(6)+(job?.name==='Bourgeois / Noble'?die(6)+die(6):0))*10);else draft.destiny=String(die(4)-1);render();return;}
+  const roll=event.target.closest('[data-roll]');if(roll){if(roll.dataset.roll==='beast'){draft.beastRoll=String(die(6));draft.beastJob='';draft.choices={};draft.skills=[];draft.magic='';draft.deity='';}else if(roll.dataset.roll==='gold')draft.gold=String((die(6)+die(6)+(job?.name==='Bourgeois / Noble'?die(6)+die(6):0))*10+(selectedNames().some(s=>key(s)==='tirelaine')?die(20):0));else draft.destiny=String(die(4)-1);render();return;}
   if(event.target.closest('#wizard-back')){if(step>0)step--;else if(step===0&&isBeast)step=-1;else{location.href='index.html';return;}render();return;}
   if(event.target.closest('#wizard-next')){if(step===-1){if(!applyBeast()){error('Lancez le D6 et choisissez un métier compatible ou « Sans métier ».');return;}step=0;render();window.scrollTo({top:0,behavior:'smooth'});return;}const problem=check();if(problem){error(problem);return;}if(step<labels.length-1){step++;render();window.scrollTo({top:0,behavior:'smooth'});return;}
-   const v=val();sessionStorage.setItem('naheul-character',JSON.stringify({name:draft.name.trim(),sex:draft.sex,origin:origin.name,job:job?.name||null,beastRoll:isBeast?Number(draft.beastRoll):null,stats:v.stats,at:v.at,prd:v.prd,ev:v.ev,ea:v.ea,gold:Number(draft.gold),destiny:Number(draft.destiny),skills:selectedNames(),affiliation:needsMagic(job)?draft.magic:needsDeity(job)?draft.deity:'',affiliationNote:needsMagic(job)?MAGIC_DISCIPLINES.find(x=>x.name===draft.magic)?.description||'':needsDeity(job)?(DIVINE_DETAILS[`${job.name}:${draft.deity}`]||[]).join(' · '):'',creationNotes:[origin.note,job?.note].filter(Boolean),allocation:stored.label||'',choices:draft.choices}));location.href='equipement.html';
+   const v=val(),oldCharacter=JSON.parse(characterStorage.getItem('naheul-character')||'null');characterStorage.setItem('naheul-character',JSON.stringify({...((oldCharacter?.origin===origin.name&&oldCharacter?.job===(job?.name||null))?{equipment:oldCharacter.equipment,loadout:oldCharacter.loadout,relic:oldCharacter.relic}:{}),name:draft.name.trim(),sex:draft.sex,origin:origin.name,job:job?.name||null,beastRoll:isBeast?Number(draft.beastRoll):null,stats:v.stats,at:v.at,prd:v.prd,ev:v.ev,ea:v.ea,gold:Number(draft.gold),destiny:Number(draft.destiny),skills:selectedNames(),affiliation:needsMagic(job)?draft.magic:needsDeity(job)?draft.deity:'',affiliationNote:needsMagic(job)?MAGIC_DISCIPLINES.find(x=>x.name===draft.magic)?.description||'':needsDeity(job)?(DIVINE_DETAILS[`${job.name}:${draft.deity}`]||[]).join(' · '):'',creationNotes:[origin.note,job?.note].filter(Boolean),allocation:stored.label||'',choices:draft.choices}));location.href='equipement.html';
   }
  });
  $('#preview-toggle').addEventListener('click',()=>{const open=$('.wizard-layout').classList.toggle('preview-open');$('#preview-toggle').setAttribute('aria-expanded',String(open));$('#preview-toggle').textContent=open?'Masquer la pré-fiche ↑':'Afficher la pré-fiche du personnage ↓';if(open)$('#wizard-preview').scrollIntoView({behavior:'smooth',block:'start'});});

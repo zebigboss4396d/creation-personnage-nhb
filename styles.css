@@ -60,3 +60,5 @@
 .limit-grid small{display:block;color:#634831}.limit-grid strong{display:block;font-size:1.08rem;color:#704127;margin-top:3px}
 .skill-choices{line-height:1.9;overflow-wrap:anywhere}
 @media(max-width:520px){.d6-button{height:67px}.d6-pips{width:47px;height:47px}.d6-pips i{width:10px;height:10px}.die-label{font-size:.83rem}.swap-die{width:35px;height:37px}.limit-grid strong{font-size:1rem}}
+
+.save-tools{margin:2rem auto;padding:1rem;border:1px solid #796b58;border-radius:12px;max-width:100%;font-size:.9rem}.save-tools button{padding:.65rem;margin:.25rem;border-radius:8px;cursor:pointer}.save-tools p{margin:.5rem 0}
