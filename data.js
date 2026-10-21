@@ -27,7 +27,7 @@ export const origins=[
  O('Amazone syldérienne',{COU:12,CHA:12,AD:11,FOR:12},{},38,{at:10,prd:8,bundle:true,note:'Origine et métier indissociables. Tête vide ; PR d’armure 6 ; armes de contact à deux mains.'}),
  O('Chamane de jungle',{INT:11,CHA:11,AD:11},{},34,{at:10,prd:9,bundle:true,note:'Origine et métier indissociables. Humain ; PR naturelle 4 ; pas d’armure métallique.'}),
  O('Semi-homme de la Loi',{INT:12,CHA:12},{FOR:10},30,{at:8,prd:10,bundle:true,unofficial:true,note:'Origine et métier indissociables ; supplément non officiel. Pas de magie ; PR d’armure 3 ; 300 PO et possessions propres à la fiche.'}),
- O('Mage culinaire hobbit',{COU:12,INT:11},{FOR:10},30,{at:8,prd:10,ea:20,bundle:true,unofficial:true,note:'Origine et métier indissociables ; supplément non officiel. Magie culinaire ; PR d’armure 3.'}),
+ O('Mage culinaire hobbit',{COU:12,INT:11},{FOR:10},30,{at:8,prd:10,ea:20,bundle:true,unofficial:true,note:'Origine et métier indissociables ; supplément non officiel. Magie culinaire ; PR d’armure 3 ; aucun bonus de PI magiques fondé sur l’INT.'}),
  O('Paladin semi-homme de Picrate',{COU:12,INT:10,CHA:11,FOR:10},{FOR:10},30,{ea:10,bundle:true,unofficial:true,note:'Profil propre au manuel ; règles de création tirées des trois premières pages seulement. FOR exactement 10 ; PR d’armure 3.'}),
  O('Paladin semi-homme de Jord’hun',{COU:12,INT:10,CHA:11,FOR:10},{FOR:10},30,{ea:10,bundle:true,unofficial:true,note:'Profil propre au manuel ; règles de création tirées des trois premières pages seulement. FOR exactement 10 ; PR d’armure 3.'})
 ];
@@ -79,5 +79,5 @@ export function startValues(stats,origin,job){
  let adChoice=null;
  if(stats.AD>12&&!job?.adIncluded)adChoice='+1 AT ou +1 PRD (AD ≥ 13)';
  if(stats.AD<=8)adChoice='−1 AT ou −1 PRD (AD ≤ 8)';
- return {at,prd,ev,ea,adChoice,impact:stats.FOR>12?stats.FOR-12:stats.FOR<=8?-1:0,spell:stats.INT>12?stats.INT-12:0};
+ return {at,prd,ev,ea,adChoice,impact:stats.FOR>12?stats.FOR-12:stats.FOR<=8?-1:0,spell:origin.name==='Mage culinaire hobbit'?0:stats.INT>12?stats.INT-12:0};
 }

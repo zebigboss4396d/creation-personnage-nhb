@@ -63,7 +63,7 @@ export function adjustedValues(base,origin,job,choices={},magic=''){
  return {stats,at,prd,ev,ea,magphys:derived.magphys,magpsy:derived.magpsy,resmag:derived.resmag,
   inge:Math.ceil((stats.INT+stats.AD)/2),pres:Math.ceil((stats.AD+stats.CHA)/2),perc:stats.INT,
   esquive:stats.AD,impact:(stats.FOR>12?stats.FOR-12:stats.FOR<=8?-1:0)+impactExtra,
-  spell:Math.max(0,stats.INT-12),impactExtra};
+  spell:origin.name==='Mage culinaire hobbit'?0:Math.max(0,stats.INT-12),impactExtra};
 }
 export function perception(stats,origin){
  const sense=SENSES[origin.beastDelta?'Homme-bête':origin.name]||{};

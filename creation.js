@@ -1,3 +1,6 @@
+import {mooteMagicProfile,syncMooteMagic,commonSpellCount,recordCommonRoll,recordVariantRoll,mooteMagicError} from './moote-magic.js';
+import {mooteMagicQuestionHTML,mooteMagicSummaryHTML} from './moote-magic-ui.js';
+import {rollUniform,animateDie} from './animated-roll.js';
 import {characterStorage} from './character-storage.js';
 import {ORDER,origins,beasts,jobs,isEligible,compatible} from './data.js';
 import {SENSES,lowlightRule,SENSORY_RULE,LOWLIGHT_RULES,WARRIOR_TECHNIQUES,isWarrior,isEngineer,isMerchant,isRanger,needsMagic,needsDeity,adjustedValues} from './creation-rules.js';
@@ -47,6 +50,10 @@ if(!origin||!validStats||stored.job&&!job){
  const key=skillKey;
  const unique=uniqueSkills;
  const statsHtml=s=>ORDER.map(k=>`<span>${k} <strong>${s[k]}</strong></span>`).join('');
+ const magicProfile=()=>({origin:origin.name,job:job?.name||null});
+ let mooteBusy=false;
+ const ensureMagic=()=>{if(mooteMagicProfile(magicProfile()))draft.mooteMagic=syncMooteMagic(draft.mooteMagic,magicProfile());};
+ const currentTitle=()=>step===2&&mooteMagicProfile(magicProfile())?'Fédulogie et grimoire du Mooté':labels[step];
  const val=()=>adjustedValues(base,origin,job,draft.choices,draft.magic);
  const save=()=>{draft.step=step;characterStorage.setItem('naheul-draft',JSON.stringify(draft));};
  const select=(id,label,options,value,placeholder='Choisissez…')=>`<label class="wizard-field">${clean(label)}<select id="${id}"><option value="">${clean(placeholder)}</option>${[...options].sort((a,b)=>a[1].localeCompare(b[1],'fr')).map(([v,t])=>`<option value="${clean(v)}" ${value===v?'selected':''}>${clean(t)}</option>`).join('')}</select></label>`;
@@ -89,6 +96,7 @@ if(!origin||!validStats||stored.job&&!job){
   return `<p class="wizard-question-intro">Choisissez exactement ${groups.reduce((n,g)=>n+g.quota,0)} compétences supplémentaires. Les compétences de naissance sont déjà acquises.</p><p><strong>Acquises :</strong> ${born.map(clean).join(' · ')||'Aucune'}</p>${groups.map((g,i)=>`<h3>${clean(g.label)} <small>(${draft.skills.filter(token=>token.startsWith(i+':')).length}/${g.quota})</small></h3><div class="wizard-checks">${g.skills.map(n=>{const id=i+':'+key(n),isChecked=draft.skills.includes(id),hint=hints[n]||hints[n.toUpperCase()]||'';return `<label class="wizard-check ${isChecked?'chosen':''}"><input type="checkbox" data-skill="${clean(id)}" ${isChecked?'checked':''}><span><strong>${clean(n)}</strong>${hint?`<span class="skill-with-tip"><button type="button" class="skill-name skill-help" aria-label="${clean(n)} : ${clean(hint)}">ⓘ</button><span class="skill-tip" role="tooltip">${clean(hint)}</span></span>`:''}</span></label>`}).join('')}</div>`).join('')}${new Set(duplicates.map(key)).size!==duplicates.length?'<p class="wizard-note">Une compétence ne peut être choisie qu’une fois.</p>':''}`;
  }
  function affiliationQuestion(){
+  if(mooteMagicProfile(magicProfile()))return mooteMagicQuestionHTML(draft.mooteMagic,magicProfile(),selectedNames());
   if(!needsMagic(job)&&!needsDeity(job))return '<p class="wizard-note">Aucune spécialité magique ni divinité supplémentaire à choisir pour ce profil.</p>';
   const magic=needsMagic(job);
   const catalog=magic?MAGIC_DISCIPLINES:job.name==='Prêtre'?PRIEST_DEITIES:PALADIN_DEITIES;
@@ -109,13 +117,13 @@ if(!origin||!validStats||stored.job&&!job){
   const limits=profileLimits(origin,job,needsDeity(job)?draft.deity:'');
   const limitHTML=`<div class="limit-grid"><span><small>PR Max</small><strong>${limits.pr??limits.naturalPr??'Aucune limite chiffrée'}</strong></span><span><small>Poids maximal porté</small><strong>${limits.kg===null?'Aucune limite chiffrée':limits.kg+' kg'}</strong></span></div>`;
   const stats=`<div class="stat-strip">${statsHtml(v.stats)}</div><div class="value-grid"><span><small>AT</small><strong>${v.at}</strong></span><span><small>PRD</small><strong>${v.prd}</strong></span><span><small>EV</small><strong>${v.ev??'—'}</strong></span><span><small>EA</small><strong>${v.ea??'—'}</strong></span><span><small>PO</small><strong>${numeric(draft.gold)}</strong></span><span><small>PD</small><strong>${numeric(draft.destiny)}</strong></span></div><div class="derived-grid"><span>MAGPHYS <strong>${v.magphys}</strong></span><span>MAGPSY <strong>${v.magpsy}</strong></span><span>RESMAG <strong>${v.resmag}</strong></span></div><p><strong>ESQUIVE :</strong> ${v.esquive} (AD avant équipement) · <strong>INGE :</strong> ${v.inge} · <strong>PRES :</strong> ${v.pres} · <strong>PERC :</strong> ${v.perc}.</p><p><strong>PI :</strong> ${v.impact>=0?'+':''}${v.impact} ${v.impactExtra?'(dont +'+v.impactExtra+' converti par l’Ogre)':''} · <strong>PI magiques :</strong> +${v.spell} si applicable.</p>`;
-  if(!full)return `<p class="eyebrow">APERÇU EN DIRECT</p><h2>${clean(origin.name)}</h2><p>${clean(job?.name|| (origin.bundle?'Profil complet':'Sans métier'))} · ${clean(stored.label)}</p>${stats}${limitHTML}<p><strong>Compétences supplémentaires :</strong> ${skills.map(clean).join(' · ')||'à choisir'}</p>`;
+  if(!full)return `<p class="eyebrow">APERÇU EN DIRECT</p><h2>${clean(origin.name)}</h2><p>${clean(job?.name|| (origin.bundle?'Profil complet':'Sans métier'))} · ${clean(stored.label)}</p>${stats}${limitHTML}${mooteMagicSummaryHTML(draft.mooteMagic,magicProfile(),skills)}<p><strong>Compétences supplémentaires :</strong> ${skills.map(clean).join(' · ')||'à choisir'}</p>`;
   const options=[...Object.entries(draft.choices).filter(([k,v])=>v!==''&&v!=='aucun'&&v!=='0'&&v!=null).map(([k,v])=>`${({warriorBonus:'Bonus guerrier',warriorTrade:'Transfert guerrier',warriorTechnique:'Coup spécial',tradeFrom:'Point retiré à',tradeTo:'Point ajouté à',rangerFrom:'Ranger : retrait à',rangerTo:'Ranger : ajout à',ogreAt:'Ogre : points retirés à l’AT',ogrePrd:'Ogre : points retirés à la PRD',address:'Bonus/malus d’Adresse sur'})[k]||k} : ${v}`)];
   const notes=[origin.note,job?.note,...(ORIGIN_DETAILS[origin.beastDelta?'Homme-bête':origin.name]||[]),...(BEAST_DETAILS[origin.name]?.notes||[]),...(JOB_DETAILS[job?.name]||[])].filter(Boolean);
   const affiliation=needsMagic(job)?draft.magic:needsDeity(job)?draft.deity:'';
   const divine=needsDeity(job)?DIVINE_DETAILS[`${job.name}:${draft.deity}`]||[]:[];
   const magicNote=needsMagic(job)?MAGIC_DISCIPLINES.find(x=>x.name===draft.magic)?.description:null;
-  return `<article class="final-sheet"><h3>Personnage de niveau 1</h3>${identity}<p><strong>Origine :</strong> ${clean(origin.name)}<br><strong>Métier :</strong> ${clean(job?.name|| (origin.bundle?'Inclus dans le profil':'Sans métier'))}<br><strong>Répartition :</strong> ${clean(stored.label)}</p>${stats}${limitHTML}<h3>Ajustements retenus</h3>${options.length?`<ul>${options.map(n=>`<li>${clean(n)}</li>`).join('')}</ul>`:'<p>Aucun ajustement facultatif appliqué.</p>'}<h3>Compétences acquises</h3><p>${born.map(clean).join(' · ')||'Aucune compétence de naissance'}</p><h3>Compétences choisies</h3><p>${skills.map(clean).join(' · ')||'À choisir'}</p>${affiliation?`<p><strong>${needsMagic(job)?'Spécialité magique':'Divinité'} :</strong> ${clean(affiliation)}.</p>`:''}<h3>Avantages et restrictions</h3><ul>${profileNotes([...notes,...divine,...(magicNote?[magicNote]:[])],origin,job,affiliation).map(n=>`<li>${clean(n)}</li>`).join('')||'<li>Voir la fiche de profil.</li>'}</ul>${senseTable(v)}</article>`;
+  return `<article class="final-sheet"><h3>Personnage de niveau 1</h3>${identity}<p><strong>Origine :</strong> ${clean(origin.name)}<br><strong>Métier :</strong> ${clean(job?.name|| (origin.bundle?'Inclus dans le profil':'Sans métier'))}<br><strong>Répartition :</strong> ${clean(stored.label)}</p>${stats}${limitHTML}<h3>Ajustements retenus</h3>${options.length?`<ul>${options.map(n=>`<li>${clean(n)}</li>`).join('')}</ul>`:'<p>Aucun ajustement facultatif appliqué.</p>'}<h3>Compétences acquises</h3><p>${born.map(clean).join(' · ')||'Aucune compétence de naissance'}</p><h3>Compétences choisies</h3><p>${skills.map(clean).join(' · ')||'À choisir'}</p>${affiliation?`<p><strong>${needsMagic(job)?'Spécialité magique':'Divinité'} :</strong> ${clean(affiliation)}.</p>`:''}<h3>Avantages et restrictions</h3><ul>${profileNotes([...notes,...divine,...(magicNote?[magicNote]:[])],origin,job,affiliation).map(n=>`<li>${clean(n)}</li>`).join('')||'<li>Voir la fiche de profil.</li>'}</ul>${mooteMagicSummaryHTML(draft.mooteMagic,magicProfile(),skills,true)}${senseTable(v)}</article>`;
  }
  function beastQuestion(){
   const number=Number(draft.beastRoll),variant=beasts[number-1];
@@ -127,9 +135,9 @@ if(!origin||!validStats||stored.job&&!job){
  }
  function question(){
   const content=[fieldChoices,skillsQuestion,affiliationQuestion,fortuneQuestion,()=>`<p class="wizard-question-intro">Indiquez le nom et le sexe du personnage, puis vérifiez sa pré-fiche avant de poursuivre.</p><div class="wizard-field-row"><label class="wizard-field">Nom du personnage<input id="character-name" type="text" maxlength="90" autocomplete="off" value="${clean(draft.name)}" placeholder="Nom du personnage"></label>${select('character-sex','Sexe',[['Féminin','Féminin'],['Masculin','Masculin']],draft.sex)}</div>${sheet(true)}`][step]();
-  return `<p class="eyebrow">QUESTION ${step+1+(isBeast?1:0)} SUR ${labels.length+(isBeast?1:0)}</p><h2>${labels[step]}</h2>${content}<div class="wizard-actions"><button type="button" class="back" id="wizard-back">${step?'← Question précédente':isBeast?'← Revoir la variante':'← Changer d’archétype'}</button><button type="button" class="next" id="wizard-next">${step===labels.length-1?'Valider et passer à l’équipement →':'Continuer →'}</button></div>`;
+  return `<p class="eyebrow">QUESTION ${step+1+(isBeast?1:0)} SUR ${labels.length+(isBeast?1:0)}</p><h2>${currentTitle()}</h2>${content}<div class="wizard-actions"><button type="button" class="back" id="wizard-back">${step?'← Question précédente':isBeast?'← Revoir la variante':'← Changer d’archétype'}</button><button type="button" class="next" id="wizard-next">${step===labels.length-1?'Valider et passer à l’équipement →':'Continuer →'}</button></div>`;
  }
- function render(){const options=sourceSkills().groups;draft.skills=draft.skills.filter(token=>{const [g,k]=token.split(':');return options[Number(g)]?.skills.some(s=>key(s)===k);});save();if(step===-1){$('#wizard-question').innerHTML=beastQuestion();$('#wizard-preview').innerHTML=`<p class="eyebrow">HOMME-BÊTE</p><h2>Variante à tirer au D6</h2><div class="stat-strip">${statsHtml(stored.stats)}</div><p>${draft.beastRoll?`Résultat ${draft.beastRoll} : ${clean(beasts[Number(draft.beastRoll)-1]?.name||'à vérifier')}`:'Lancez le dé pour déterminer la variante, puis choisissez le métier.'}</p>`;$('#wizard-progress').textContent='1 / 6 · Variante Homme-bête';}else{$('#wizard-question').innerHTML=question();$('#wizard-preview').innerHTML=sheet();$('#wizard-progress').textContent=`${step+1+(isBeast?1:0)} / ${labels.length+(isBeast?1:0)} · ${labels[step]}`;}$('#wizard-error').hidden=true;}
+ function render(){const options=sourceSkills().groups;draft.skills=draft.skills.filter(token=>{const [g,k]=token.split(':');return options[Number(g)]?.skills.some(s=>key(s)===k);});ensureMagic();save();if(step===-1){$('#wizard-question').innerHTML=beastQuestion();$('#wizard-preview').innerHTML=`<p class="eyebrow">HOMME-BÊTE</p><h2>Variante à tirer au D6</h2><div class="stat-strip">${statsHtml(stored.stats)}</div><p>${draft.beastRoll?`Résultat ${draft.beastRoll} : ${clean(beasts[Number(draft.beastRoll)-1]?.name||'à vérifier')}`:'Lancez le dé pour déterminer la variante, puis choisissez le métier.'}</p>`;$('#wizard-progress').textContent='1 / 6 · Variante Homme-bête';}else{$('#wizard-question').innerHTML=question();$('#wizard-preview').innerHTML=sheet();$('#wizard-progress').textContent=`${step+1+(isBeast?1:0)} / ${labels.length+(isBeast?1:0)} · ${currentTitle()}`;}$('#wizard-error').hidden=true;}
  function error(message){$('#wizard-error').textContent=message;$('#wizard-error').hidden=false;$('#wizard-error').scrollIntoView({behavior:'smooth',block:'center'});}
  function check(){
   if(step===0){
@@ -147,6 +155,7 @@ if(!origin||!validStats||stored.job&&!job){
    if(seen.size!==draft.skills.length)return 'Supprimez les choix qui ne figurent plus dans la liste.';
   }
   if(step===2){
+   if(mooteMagicProfile(magicProfile()))return mooteMagicError(draft.mooteMagic,magicProfile(),selectedNames());
    if(needsMagic(job)&&!MAGIC_DISCIPLINES.some(x=>x.name===draft.magic))return 'Choisissez une spécialité magique dans la liste.';
    if(needsDeity(job)&&!(job.name==='Prêtre'?PRIEST_DEITIES:PALADIN_DEITIES).some(x=>x.name===draft.deity))return 'Choisissez une divinité dans la liste.';
   }
@@ -158,7 +167,25 @@ if(!origin||!validStats||stored.job&&!job){
  }
  const die=n=>{if(!globalThis.crypto?.getRandomValues)return Math.floor(Math.random()*n)+1;const a=new Uint8Array(1),limit=Math.floor(256/n)*n;do{crypto.getRandomValues(a);}while(a[0]>=limit);return a[0]%n+1;};
  if(origin.name==='Semi-homme de la Loi'&&draft.gold==='')draft.gold='300';
+ async function runMooteRoll(kind,index,manual,button){
+  if(mooteBusy||step!==2||!mooteMagicProfile(magicProfile()))return;
+  let issue='',status;
+  try{
+   ensureMagic();const config=mooteMagicProfile(magicProfile()),sides=kind==='variant'?6:config.die;
+   const result=manual===undefined?rollUniform(sides):Number(manual);
+   status=kind==='variant'?recordVariantRoll(draft.mooteMagic,magicProfile(),selectedNames(),index,result):recordCommonRoll(draft.mooteMagic,magicProfile(),selectedNames(),index,result);
+   if(status.status==='locked')return;
+   // Le résultat est enregistré avant l'animation : recharger ne permet pas de relancer un succès.
+   mooteBusy=true;save();$('#wizard-question').querySelectorAll('button,select').forEach(el=>el.disabled=true);
+   const notice=$('#moote-roll-status');if(notice)notice.textContent='Le grimoire mijote…';
+   if(manual===undefined)await animateDie(button,sides,result);
+  }catch(e){issue=e.message;}finally{
+   mooteBusy=false;render();if(issue)error(issue);else if(status){const notice=$('#moote-roll-status');if(notice)notice.textContent=status.status==='duplicate'?'Ce sort est déjà connu : relancez ce dé.':'Résultat enregistré dans votre grimoire.';}
+  }
+ }
  $('#wizard-question').addEventListener('change',event=>{
+  if(mooteBusy)return;
+  if(event.target.dataset.mooteManual){if(event.target.value)void runMooteRoll(event.target.dataset.mooteManual,Number(event.target.dataset.mooteSlot),event.target.value);return;}
   const {id}=event.target;
   if(isBeast&&step===-1&&id==='beast-roll-manual'){draft.beastRoll=event.target.value;draft.beastJob='';draft.choices={};draft.skills=[];draft.magic='';draft.deity='';render();return;}
   if(isBeast&&step===-1&&id==='beast-job'){draft.beastJob=event.target.value;render();return;}
@@ -177,12 +204,14 @@ if(!origin||!validStats||stored.job&&!job){
   if(map[event.target.id]){draft[map[event.target.id]]=event.target.value;save();$('#wizard-preview').innerHTML=sheet();if(step===4&&$('#wizard-question .final-sheet'))$('#wizard-question .final-sheet').outerHTML=sheet(true);}
  });
  $('#wizard-question').addEventListener('click',event=>{
+  if(mooteBusy)return;const magicRoll=event.target.closest('[data-moote-kind]');if(magicRoll){void runMooteRoll(magicRoll.dataset.mooteKind,Number(magicRoll.dataset.mooteSlot),undefined,magicRoll);return;}
   const roll=event.target.closest('[data-roll]');if(roll){if(roll.dataset.roll==='beast'){draft.beastRoll=String(die(6));draft.beastJob='';draft.choices={};draft.skills=[];draft.magic='';draft.deity='';}else if(roll.dataset.roll==='gold')draft.gold=String((die(6)+die(6)+(job?.name==='Bourgeois / Noble'?die(6)+die(6):0))*10+(selectedNames().some(s=>key(s)==='tirelaine')?die(20):0));else draft.destiny=String(die(4)-1);render();return;}
   if(event.target.closest('#wizard-back')){if(step>0)step--;else if(step===0&&isBeast)step=-1;else{location.href='index.html';return;}render();return;}
   if(event.target.closest('#wizard-next')){if(step===-1){if(!applyBeast()){error('Lancez le D6 et choisissez un métier compatible ou « Sans métier ».');return;}step=0;render();window.scrollTo({top:0,behavior:'smooth'});return;}const problem=check();if(problem){error(problem);return;}if(step<labels.length-1){step++;render();window.scrollTo({top:0,behavior:'smooth'});return;}
-   const v=val(),oldCharacter=JSON.parse(characterStorage.getItem('naheul-character')||'null');characterStorage.setItem('naheul-character',JSON.stringify({...((oldCharacter?.origin===origin.name&&oldCharacter?.job===(job?.name||null))?{equipment:oldCharacter.equipment,loadout:oldCharacter.loadout,relic:oldCharacter.relic}:{}),name:draft.name.trim(),sex:draft.sex,origin:origin.name,job:job?.name||null,beastRoll:isBeast?Number(draft.beastRoll):null,stats:v.stats,at:v.at,prd:v.prd,ev:v.ev,ea:v.ea,gold:Number(draft.gold),destiny:Number(draft.destiny),skills:selectedNames(),affiliation:needsMagic(job)?draft.magic:needsDeity(job)?draft.deity:'',affiliationNote:needsMagic(job)?MAGIC_DISCIPLINES.find(x=>x.name===draft.magic)?.description||'':needsDeity(job)?(DIVINE_DETAILS[`${job.name}:${draft.deity}`]||[]).join(' · '):'',creationNotes:[origin.note,job?.note].filter(Boolean),allocation:stored.label||'',choices:draft.choices}));location.href='equipement.html';
+   const v=val(),oldCharacter=JSON.parse(characterStorage.getItem('naheul-character')||'null');characterStorage.setItem('naheul-character',JSON.stringify({...((oldCharacter?.origin===origin.name&&oldCharacter?.job===(job?.name||null))?{equipment:oldCharacter.equipment,loadout:oldCharacter.loadout,relic:oldCharacter.relic}:{}),name:draft.name.trim(),sex:draft.sex,origin:origin.name,job:job?.name||null,beastRoll:isBeast?Number(draft.beastRoll):null,stats:v.stats,at:v.at,prd:v.prd,ev:v.ev,ea:v.ea,gold:Number(draft.gold),destiny:Number(draft.destiny),skills:selectedNames(),mooteMagic:mooteMagicProfile(magicProfile())?draft.mooteMagic:null,affiliation:needsMagic(job)?draft.magic:needsDeity(job)?draft.deity:'',affiliationNote:needsMagic(job)?MAGIC_DISCIPLINES.find(x=>x.name===draft.magic)?.description||'':needsDeity(job)?(DIVINE_DETAILS[`${job.name}:${draft.deity}`]||[]).join(' · '):'',creationNotes:[origin.note,job?.note].filter(Boolean),allocation:stored.label||'',choices:draft.choices}));location.href='equipement.html';
   }
  });
  $('#preview-toggle').addEventListener('click',()=>{const open=$('.wizard-layout').classList.toggle('preview-open');$('#preview-toggle').setAttribute('aria-expanded',String(open));$('#preview-toggle').textContent=open?'Masquer la pré-fiche ↑':'Afficher la pré-fiche du personnage ↓';if(open)$('#wizard-preview').scrollIntoView({behavior:'smooth',block:'start'});});
+ ensureMagic();if(step>2&&mooteMagicError(draft.mooteMagic,magicProfile(),selectedNames()))step=2;
  render();
 }

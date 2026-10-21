@@ -85,3 +85,19 @@
 .dice-reset:hover{background:#ffe4b7}.dice-reset-row small{color:#e3c8a0}.form-actions button:disabled{opacity:.5;cursor:not-allowed}.form-actions button[hidden]{display:none}
 @media(max-width:520px){.dice-scene{--cube-size:44px;--half-cube:22px}.d6-button{height:88px}.dice-face .d6-pips i{width:7px;height:7px}.dice-mode select{width:100%}.dice-reset{width:100%}.die-state{font-size:.7rem}}
 @media(prefers-reduced-motion:reduce){.dice-cube{animation:none!important;transition:none!important}}
+
+/* Grimoire des profils non officiels du Mooté. */
+.job-tags button.moote-fun{background:#f2d7a1;color:#654019;border-color:#b7863f;font-size:.76rem}.job-tags button.moote-fun:hover{background:#ffe7b9;color:#452810}
+.moote-dialog{max-width:min(550px,92vw);border:2px solid #9a6b3d;border-radius:15px;padding:24px;background:#fff0d3;color:#432e1f;box-shadow:0 20px 70px #20120c88}.moote-dialog::backdrop{background:#23170f99}.moote-dialog h2{font-family:Georgia,serif}.moote-dialog p{line-height:1.55}
+.moote-slot-list{display:grid;gap:16px}.moote-slot{background:#fff9ec;color:#493220;border:1px solid #c7a77b;border-radius:13px;padding:17px}.moote-slot h3{margin:0 0 12px}.moote-slot h3 small{display:block;font:400 .8rem system-ui;color:#786143;margin-top:4px}
+.moote-roll-row{display:flex;align-items:center;gap:18px;min-width:0}.moote-roll-row>div{flex:1;min-width:0}.moote-roll-row p{font-size:.9rem;line-height:1.45}.moote-roll-row select{width:100%}
+.moote-die{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex:none;min-width:90px;min-height:106px;border:1px solid #b79363;border-radius:12px;background:#e7ceab;color:#382a24;cursor:pointer;padding:12px;perspective:380px;touch-action:manipulation}.moote-die:disabled{opacity:1;cursor:default;background:#eee1ca;border-color:#c3b499}.moote-die small{font-weight:750;color:#665038}
+.moote-die-shape{display:grid;place-items:center;width:56px;height:56px;font:800 1.6rem system-ui;background:linear-gradient(135deg,#fef9ed,#cfac77);color:#442d1b;box-shadow:inset 2px 2px 5px #fff9,0 3px 4px #38230d55;transform-style:preserve-3d}
+.moote-d8{clip-path:polygon(50% 0,100% 28%,90% 78%,50% 100%,10% 78%,0 28%);background:conic-gradient(from 45deg,#e4be72,#fff4c7,#c19452,#f7dfa4,#e4be72)}
+.moote-d10{clip-path:polygon(50% 0,80% 12%,100% 38%,94% 70%,70% 94%,36% 100%,9% 79%,0 49%,17% 18%);background:conic-gradient(from 45deg,#b6cbd4,#f4faff,#839fad,#dcebf0,#b6cbd4)}
+.moote-d6{border-radius:9px;border:1px solid #9b774d}.moote-d6 .d6-pips{width:42px;height:42px}.moote-d6 .d6-pips i{width:8px;height:8px}
+.moote-variant{padding-top:10px;margin-top:14px;border-top:1px dashed #bea079}.moote-variant h4{margin:2px 0 12px}.moote-variant details{margin-top:12px;font-size:.85rem}.moote-variant summary{cursor:pointer}
+.moote-spell-card{margin:10px 0;padding:11px 13px;background:#f7edd9;color:#4c3825;border:1px solid #c9af85;border-radius:9px;overflow-wrap:anywhere}.moote-spell-card summary{font-weight:750;cursor:pointer;color:#6c3c20;line-height:1.45}.moote-spell-card p{font-size:.9rem;line-height:1.55}.moote-spell-card dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0}.moote-spell-card dt{font-size:.73rem;font-weight:800;color:#7a6041}.moote-spell-card dd{margin:3px 0;font-size:.86rem}.moote-spell-card small{display:block;font-size:.73rem;color:#786346}
+.moote-summary{margin:18px 0;padding-top:9px;border-top:1px solid #bca17c}.moote-summary h3{margin:8px 0}.moote-summary ul{padding-left:20px;line-height:1.6}.moote-summary p{line-height:1.5}
+@media(max-width:520px){.moote-slot{padding:12px}.moote-roll-row{gap:12px}.moote-die{min-width:73px;min-height:96px;padding:9px}.moote-spell-card dl{grid-template-columns:1fr}.moote-die-shape{width:49px;height:49px}}
+@media(prefers-reduced-motion:reduce){.moote-die-shape{animation:none!important;transition:none!important}}
