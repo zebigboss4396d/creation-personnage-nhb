@@ -62,3 +62,26 @@
 @media(max-width:520px){.d6-button{height:67px}.d6-pips{width:47px;height:47px}.d6-pips i{width:10px;height:10px}.die-label{font-size:.83rem}.swap-die{width:35px;height:37px}.limit-grid strong{font-size:1rem}}
 
 .save-tools{margin:2rem auto;padding:1rem;border:1px solid #796b58;border-radius:12px;max-width:100%;font-size:.9rem}.save-tools button{padding:.65rem;margin:.25rem;border-radius:8px;cursor:pointer}.save-tools p{margin:.5rem 0}
+
+/* Lancers individuels : les six faces forment un vrai cube CSS. */
+.dice-mode{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-weight:700;color:#f8e5c4;margin:12px 0}
+.dice-mode select,.manual-die{font:inherit;padding:9px 12px;border:1px solid #b28a61;border-radius:8px;background:#fff6e6;color:#422b1c}
+.dice-mode-help,.dice-status{color:#efdbba;font-size:.88rem;line-height:1.5}
+.dice-grid .die{perspective:500px;overflow:visible}
+.d6-button{height:100px;position:relative;background:radial-gradient(ellipse at 50% 85%,#302014 0,#785234 65%,#9d7049);box-shadow:inset 0 0 0 3px #ebc48c22,0 4px 0 #3b281b;overflow:visible;cursor:pointer}
+.dice-scene{--cube-size:52px;--half-cube:26px;display:block;position:relative;width:var(--cube-size);height:var(--cube-size);perspective:420px}
+.dice-cube{position:absolute;inset:0;display:block;transform-style:preserve-3d}
+.dice-face{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(145deg,#fffaf0,#dfc9a7);border:1px solid #9a7047;border-radius:8px;backface-visibility:hidden;box-shadow:inset 0 0 5px #946d3822}
+.dice-face .d6-pips{width:80%;height:80%}.dice-face .d6-pips i{width:8px;height:8px;box-shadow:inset 1px 1px 2px #160d08}
+.dice-face-1{transform:translateZ(var(--half-cube))}.dice-face-6{transform:rotateY(180deg) translateZ(var(--half-cube))}.dice-face-3{transform:rotateY(90deg) translateZ(var(--half-cube))}.dice-face-4{transform:rotateY(-90deg) translateZ(var(--half-cube))}.dice-face-2{transform:rotateX(90deg) translateZ(var(--half-cube))}.dice-face-5{transform:rotateX(-90deg) translateZ(var(--half-cube))}
+.dice-question{display:none;position:absolute;inset:0;place-items:center;font-size:2rem;font-weight:800;color:#593b24;background:#f4e0bf;border:2px dashed #ac7c4d;border-radius:10px}
+.is-empty .dice-cube{visibility:hidden}.is-empty .dice-question{display:grid}
+.d6-button:disabled{opacity:1;cursor:default}.d6-button:disabled:hover,.d6-button:disabled:active{transform:none}
+.d6-button.is-locked{border-color:#bda16b}.d6-button.is-rolling{border-color:#ffe3a5;box-shadow:0 0 16px #f4c47366}
+.die-state{display:block;min-height:2.2em;margin-top:4px;text-align:center;color:#edd7b1;font-size:.73rem;line-height:1.2}
+.manual-die{margin:5px 0;width:100%}.manual-die[hidden]{display:none}
+.dice-reset-row{border-top:1px solid #c89d6544;margin-top:17px;padding-top:15px;display:flex;flex-direction:column;align-items:flex-start;gap:7px}
+.dice-reset{font:inherit;font-weight:700;background:#f1d1a0;color:#57331e;border:1px solid #b8814f;border-radius:9px;padding:11px 15px;cursor:pointer;text-align:left;touch-action:manipulation}
+.dice-reset:hover{background:#ffe4b7}.dice-reset-row small{color:#e3c8a0}.form-actions button:disabled{opacity:.5;cursor:not-allowed}.form-actions button[hidden]{display:none}
+@media(max-width:520px){.dice-scene{--cube-size:44px;--half-cube:22px}.d6-button{height:88px}.dice-face .d6-pips i{width:7px;height:7px}.dice-mode select{width:100%}.dice-reset{width:100%}.die-state{font-size:.7rem}}
+@media(prefers-reduced-motion:reduce){.dice-cube{animation:none!important;transition:none!important}}
