@@ -13,8 +13,8 @@ export function restoreDice(saved){
 }
 export function initDiceController({document,storage,onInvalidate=()=>{},draw=rollD6,duration=1050}){
  const $=s=>document.querySelector(s),grid=$('#dice-grid'),form=$('#dice-form');
- let stored;try{stored=JSON.parse(storage.getItem('naheul-dice')||'null');}catch{}
- const restored=restoreDice(stored);let mode=restored.mode,values=restored.values,epoch=0;
+ // Chaque ouverture de la page propose un nouveau tirage, même si des dés sont sauvegardés.
+ let mode='random',values=DICE_ORDER.map(()=>null),epoch=0;
  const pending=new Set(),animations=new Map(),buttons=new Map(),selectors=new Map();
  const persist=()=>storage.setItem('naheul-dice',JSON.stringify({version:2,mode,values}));
  const announce=text=>{$('#dice-status').textContent=text;};
@@ -75,6 +75,8 @@ export function initDiceController({document,storage,onInvalidate=()=>{},draw=ro
  $('#dice-entry-mode').addEventListener('change',event=>reset(event.target.value==='manual'?'manual':'random'));
  $('#roll-random').addEventListener('click',()=>{for(const key of DICE_ORDER)void roll(key);});
  form.addEventListener('submit',event=>{if(!complete()){event.preventDefault();event.stopImmediatePropagation();announce('Terminez les cinq dés avant de lancer l’analyse.');}});
- refresh();announce(complete()?'Vos cinq dés sont conservés. Vous pouvez analyser vos tirages.':count()?`${count()} résultat(s) conservé(s). Lancez les dés restants.`:'Cliquez sur chaque dé pour le lancer.');
+ // Effacer uniquement les dés précédents ; le personnage déjà créé reste sauvegardé.
+ persist();refresh();announce('Cliquez sur chaque dé pour le lancer.');
+ document.defaultView?.addEventListener('pageshow',event=>{if(event.persisted)reset('random');});
  return {roll,reset,isComplete:complete,getState:()=>({mode,values:[...values],pending:[...pending]})};
 }

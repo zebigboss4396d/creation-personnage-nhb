@@ -71,3 +71,12 @@ export function perception(stats,origin){
  const lowlight=sense.nuit==='totale'?base:sense.nuit==='partielle'?base-4:sense.nuit==='moyenne'?null:Math.ceil(base/2);
  return {sense,base,vue:base+(sense.vue||0),odorat:base+(sense.odorat||0),ouie:base+(sense.ouie||0),lowlight};
 }
+
+export const SENSORY_RULE='Sens mauvais : −1 ; normal : 0 ; bon : +1 ; excellent : +2.';
+export const LOWLIGHT_RULES='Très basse lumière : sans nyctalopie, épreuve sous INT / 2, arrondie au supérieur ; nyctalopie partielle, épreuve sous INT − 4 ; nyctalopie totale, épreuve sous INT.';
+export function lowlightRule(night){
+ if(night==='moyenne')return 'Nyctalopie moyenne : effet à préciser avec le MJ, ce cas étant absent du tableau de base.';
+ if(night==='totale')return 'Nyctalopie totale : épreuve sous INT en très basse lumière.';
+ if(night==='partielle')return 'Nyctalopie partielle : épreuve sous INT − 4 en très basse lumière.';
+ return 'Aucune nyctalopie : épreuve sous INT / 2 en très basse lumière, arrondie au supérieur.';
+}

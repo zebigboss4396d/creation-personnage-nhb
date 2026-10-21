@@ -3,10 +3,8 @@ const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLo
 export const isShield=i=>/bouclier|pavois/i.test((i.name||'')+' '+(i.section||''));
 export const isMagicArmor=i=>/ench\.|enchante|magique/i.test(norm([i.name,i.section].join(' ')));
 export const armorPrForLimit=i=>isShield(i)?0:Number(i.prForLimit??i.pr)||0;
-const divineLimits={'Prêtre:Niourgl':5,'Prêtre:Adathie':5,'Prêtre:Dlul':5};
 export function characterPrLimit(p){
- const l=profileLimits({name:p.origin},{name:p.job}),limit=l.pr??l.naturalPr,divine=divineLimits[`${p.job}:${p.affiliation}`];
- const limits=[limit,divine].filter(Number.isFinite);return limits.length?Math.min(...limits):null;
+ const limits=profileLimits({name:p.origin},{name:p.job},p.affiliation);return limits.pr??limits.naturalPr;
 }
 export function equipmentEligibility(item,p){
  const n=norm(item.name),section=norm(item.section),o=p.origin||'',j=p.job||'',god=p.affiliation||'';

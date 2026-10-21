@@ -1,8 +1,8 @@
 import {initDiceController} from './dice-controller.js';
 import {characterStorage} from './character-storage.js';
 import {ORDER,origins,beasts,jobs,isEligible,compatible,startValues,derivedValues} from './data.js';
-import {SENSES} from './creation-rules.js';
-import {profileLimits} from './profile-limits.js';
+import {SENSES,lowlightRule,SENSORY_RULE,LOWLIGHT_RULES} from './creation-rules.js';
+import {profileLimits,withoutNumericLimits} from './profile-limits.js';
 import {skillOptions} from './skill-rules.js';
 import {BEAST_DETAILS} from './creation-details.js';
 const skillData=await fetch('./skills.json').then(r=>r.json());
@@ -31,7 +31,7 @@ function perceptionHTML(origin){
  const labels=[['vue','Vue'],['ouie','Ouïe'],['odorat','Odorat']];
  const output=labels.filter(([key])=>sense[key]).map(([key,label])=>`${label} ${sense[key]>0?'+':''}${sense[key]}`);
  if(sense.nuit)output.push(`Nyctalopie ${sense.nuit}`);
- return output.length?`<p class="selection-note"><strong>Perception :</strong> ${output.map(escape).join(' · ')}.</p>`:'';
+ return `<p class="selection-note"><strong>Perception :</strong> ${output.length?output.map(escape).join(' · '):'Sens normaux'}.</p><p class="selection-note">${escape(lowlightRule(sense.nuit))}</p><details class="skill-details"><summary>Règles des tableaux de perception</summary><p>${escape(SENSORY_RULE)}</p><p>${escape(LOWLIGHT_RULES)}</p></details>`;
 }
 function statDice(stats){return `<span class="swap-stats" aria-label="Scores après échange : ${ORDER.map(k=>`${k} ${stats[k]}`).join(', ')}">${ORDER.map(k=>`<span class="swap-die"><small>${k}</small><strong>${stats[k]}</strong></span>`).join('')}</span>`;}
 function scenarios(rolls){const original=Object.fromEntries(ORDER.map((k,i)=>[k,rolls[i]+7]));const out=[{stats:original,label:'Sans échange',direct:true}];const seen=new Set([ORDER.map(k=>original[k]).join(',')]);for(let i=0;i<5;i++)for(let j=i+1;j<5;j++){const scores={...original};[scores[ORDER[i]],scores[ORDER[j]]]=[scores[ORDER[j]],scores[ORDER[i]]];const hash=ORDER.map(k=>scores[k]).join(',');if(!seen.has(hash)){out.push({stats:scores,label:`Échanger ${ORDER[i]} ↔ ${ORDER[j]}`,direct:false});seen.add(hash)}}return out}
@@ -63,7 +63,7 @@ function swapOverview(){
 function selectionHTML(origin,scenario,job){
  const stats=effectiveStats(origin,scenario),v=startValues(stats,origin,job),derived=derivedValues(stats);
  const title=job?`${origin.name} · ${job.name}`:origin.bundle||origin.beast?origin.name:`${origin.name} · Sans métier`;
- const notes=[origin.note,job?.note].filter(Boolean),limits=profileLimits(origin,job);
+ const notes=[origin.note,job?.note].map(withoutNumericLimits).filter(Boolean),limits=profileLimits(origin,job);
  const allowMagic=Boolean(job?.magic||['Mage culinaire hobbit','Chamane de jungle','Paladin semi-homme de Picrate','Paladin semi-homme de Jord’hun'].includes(origin.name));
  return `<div class="selection-heading"><p class="eyebrow">COMBINAISON CHOISIE</p><h3>${escape(title)}</h3><p>${escape(scenario.label)}${origin.unofficial?' · Supplément non officiel':''}</p></div><a class="primary continue-link mobile-continue" href="creation.html">Valider et continuer →</a>${origin.beast?'<p class="selection-note special-rule"><strong>Étape suivante :</strong> lancez 1D6 pour déterminer la variante Homme-bête, puis choisissez parmi les métiers compatibles avec ses scores modifiés.</p>':''}<div class="stat-strip">${statText(stats)}</div><div class="value-grid"><span><small>Énergie vitale</small><strong>${v.ev==null?'À déterminer':formatNum(v.ev)}</strong></span><span><small>Énergie astrale</small><strong>${v.ea==null?'–':formatNum(v.ea)}</strong></span><span><small>Attaque</small><strong>${formatNum(v.at)}</strong></span><span><small>Parade</small><strong>${formatNum(v.prd)}</strong></span></div><div class="derived-grid"><span>MAGPHYS <strong>${derived.magphys}</strong></span><span>MAGPSY <strong>${derived.magpsy}</strong></span><span>RESMAG <strong>${derived.resmag}</strong></span></div><div class="limit-grid"><span><small>PR Max</small><strong>${limits.pr??'Aucune limite chiffrée'}</strong></span><span><small>Poids maximal porté</small><strong>${limits.kg==null?'Aucune limite chiffrée':`${limits.kg} kg`}</strong></span></div>${limits.naturalPr!=null?`<p class="selection-note">PR naturelle maximale : ${limits.naturalPr} ; armures selon la fiche.</p>`:''}${limits.weapons.length?`<p class="selection-note"><strong>Armes et boucliers :</strong> ${limits.weapons.map(escape).join(' · ')}.</p>`:''}${perceptionHTML(origin)}${notes.map(note=>`<p class="selection-note">${escape(note)}</p>`).join('')}${origin.name==='Humain'&&!job?'<p class="selection-note special-rule"><strong>Humain sans métier :</strong> choisissez trois compétences parmi les compétences génériques autorisées. Un métier pourra être choisi à partir du niveau 3, si les conditions sont remplies.</p>':''}${v.adChoice?`<p class="selection-note">${escape(v.adChoice)}</p>`:''}${v.impact?`<p class="selection-note">PI ${v.impact>0?'+':''}${v.impact} grâce à la Force.</p>`:''}${allowMagic&&v.spell?`<p class="selection-note">PI magiques +${v.spell} pour les sorts concernés grâce à l’Intelligence.</p>`:''}<section class="selected-skills"><h4>Compétences à choisir au niveau 1</h4>${choiceSkillsHTML(origin,job)}</section><a class="primary continue-link" href="creation.html">Valider cet archétype et continuer →</a>`;
 }

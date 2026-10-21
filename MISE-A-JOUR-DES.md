@@ -6,7 +6,7 @@ Le bouton « Je relance… mais chut, pas un mot au MJ ! » efface les cinq dés
 
 L’analyse est disponible uniquement lorsque les cinq dés sont arrêtés. Le bouton commun lance seulement les dés encore vierges ; il ne permet pas de relancer un résultat déjà obtenu.
 
-Le mode « Saisir mes propres tirages » accepte les dés lancés sur table. Changer de mode efface les cinq résultats. Les résultats partiels sont conservés au rechargement, ainsi que leur verrouillage. Un résultat aléatoire est sauvegardé dès le début du lancer afin qu’un rechargement n’autorise pas sa relance.
+Le mode « Saisir mes propres tirages » accepte les dés lancés sur table. Changer de mode efface les cinq résultats. À chaque ouverture de la page, les cinq dés affichent « ? » et sont prêts à lancer. Le personnage déjà créé reste sauvegardé indépendamment. Les dés restent verrouillés tant que cette page demeure ouverte, jusqu’au bouton de relance globale.
 
 L’animation utilise un cube CSS à six faces et respecte la préférence système de réduction des animations. Aucun service externe ni bibliothèque graphique supplémentaire.
 

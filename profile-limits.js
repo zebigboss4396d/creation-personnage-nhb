@@ -39,14 +39,31 @@ const jobWeapons={
  'Prêtre':['Armes et protections précisées par la divinité choisie en page 2'],
  'Paladin':['Armes et protections à vérifier selon la divinité choisie en page 2']
 };
-export function profileLimits(origin,job){
+const divinePrLimits={'Prêtre:Niourgl':5,'Prêtre:Adathie':5,'Prêtre:Dlul':5};
+export function profileLimits(origin,job,affiliation=''){
  const o=origins[origin.name]||{},j=jobs[job?.name]||{};
  const warrior=job?.name==='Guerrier / Gladiateur';
  const originPr=o.pr==null?null:o.pr+(warrior?1:0);
- const pr=[originPr,j.pr].filter(Number.isFinite);
+ const pr=[originPr,j.pr,divinePrLimits[`${job?.name}:${affiliation}`]].filter(Number.isFinite);
  const kg=[o.kg,j.kg].filter(Number.isFinite);
  return {pr:pr.length?Math.min(...pr):null,kg:kg.length?Math.min(...kg):null,
   naturalPr:origin.name==='Chamane de jungle'?4:null,
   weapons:[...new Set([...(originWeapons[origin.name]||[]),...(jobWeapons[job?.name]||[])])]
  };
+}
+
+// Les anciennes limites isolées ne doivent pas contredire le profil combiné.
+export function withoutNumericLimits(note){
+ return String(note||'')
+  .replace(/(?:armure limitée à\s*PR|PR d[’']armure|PR max(?:imale)?\s*:?|PR naturelle)\s*\d+(?:\s*\([^)]*\))?/gi,match=>/équipements spéciaux/i.test(match)?'Équipements spéciaux : limites selon leur fiche':'')
+  .replace(/(?:charge(?: maximale)?(?: de)?|poids maximal porté(?: de)?|transport de charges limité à)\s*\d+(?:[,.]\d+)?\s*kg/gi,'')
+  .replace(/([.;])\s*[;.,]+/g,'$1').replace(/^[\s;,.]+|[\s;,.]+$/g,'').trim();
+}
+export function limitSummary(origin,job,affiliation=''){
+ const limits=profileLimits(origin,job,affiliation);
+ const pr=limits.pr??limits.naturalPr;
+ return `Limites retenues : PR max ${pr??'sans limite chiffrée'}${pr===null?'':' (hors magie)'} ; poids maximal porté ${limits.kg===null?'sans limite chiffrée':limits.kg+' kg'}.`;
+}
+export function profileNotes(notes,origin,job,affiliation=''){
+ return [limitSummary(origin,job,affiliation),...notes.map(withoutNumericLimits).filter(Boolean)];
 }
