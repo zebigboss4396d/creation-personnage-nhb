@@ -101,3 +101,5 @@
 .moote-summary{margin:18px 0;padding-top:9px;border-top:1px solid #bca17c}.moote-summary h3{margin:8px 0}.moote-summary ul{padding-left:20px;line-height:1.6}.moote-summary p{line-height:1.5}
 @media(max-width:520px){.moote-slot{padding:12px}.moote-roll-row{gap:12px}.moote-die{min-width:73px;min-height:96px;padding:9px}.moote-spell-card dl{grid-template-columns:1fr}.moote-die-shape{width:49px;height:49px}}
 @media(prefers-reduced-motion:reduce){.moote-die-shape{animation:none!important;transition:none!important}}
+
+.moote-d4{clip-path:polygon(50% 0,100% 100%,0 100%);background:conic-gradient(from 0deg at 50% 63%,#f1d5a0 0deg 120deg,#b78648 120deg 240deg,#ffe9bc 240deg 360deg)}.moote-d4>span{padding-top:16px;font-size:1.35rem;text-shadow:0 1px #fff8}.moote-d20{clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:conic-gradient(from 30deg,#bbd4bf,#f4fae6,#87ab8b,#bbd4bf)}

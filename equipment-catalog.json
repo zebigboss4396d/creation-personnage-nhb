@@ -5894,13 +5894,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "3 · Dégâts +4",
-    "pr": 3,
+    "notes": "Charges : 3 · Dégâts +4",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 3
   },
   {
     "id": "objet-361",
@@ -5911,13 +5912,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "5 · Dégâts +4",
-    "pr": 5,
+    "notes": "Charges : 5 · Dégâts +4",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-362",
@@ -5928,13 +5930,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "5 · Dégâts +5",
-    "pr": 5,
+    "notes": "Charges : 5 · Dégâts +5",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-363",
@@ -5945,13 +5948,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "5 · Dégâts +6",
-    "pr": 5,
+    "notes": "Charges : 5 · Dégâts +6",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-364",
@@ -5962,13 +5966,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "5 · Dégâts +7",
-    "pr": 5,
+    "notes": "Charges : 5 · Dégâts +7",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-365",
@@ -5979,13 +5984,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "3 · Dépense en PA : -3",
-    "pr": 3,
+    "notes": "Charges : 3 · Dépense en PA : -3",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 3
   },
   {
     "id": "objet-366",
@@ -5996,13 +6002,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "5 · Dépense en PA : -4",
-    "pr": 5,
+    "notes": "Charges : 5 · Dépense en PA : -4",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-367",
@@ -6013,13 +6020,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "5 · Dépense en PA : -5",
-    "pr": 5,
+    "notes": "Charges : 5 · Dépense en PA : -5",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-368",
@@ -6030,13 +6038,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "5 · Dépense en PA : -7",
-    "pr": 5,
+    "notes": "Charges : 5 · Dépense en PA : -7",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-369",
@@ -6047,13 +6056,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "5 · Dépense en PA : -8",
-    "pr": 5,
+    "notes": "Charges : 5 · Dépense en PA : -8",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-370",
@@ -6064,13 +6074,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "3 · Sort : épreuve+2",
-    "pr": 3,
+    "notes": "Charges : 3 · Sort : épreuve+2",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 3
   },
   {
     "id": "objet-371",
@@ -6081,13 +6092,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "5 · Sort : épreuve+2",
-    "pr": 5,
+    "notes": "Charges : 5 · Sort : épreuve+2",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-372",
@@ -6098,13 +6110,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "5 · Sort : épreuve+3",
-    "pr": 5,
+    "notes": "Charges : 5 · Sort : épreuve+3",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-373",
@@ -6115,13 +6128,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "5 · Sort : épreuve+4",
-    "pr": 5,
+    "notes": "Charges : 5 · Sort : épreuve+4",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-374",
@@ -6132,13 +6146,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "5 · Sort : épreuve+4",
-    "pr": 5,
+    "notes": "Charges : 5 · Sort : épreuve+4",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-375",
@@ -6149,13 +6164,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "3 · RM de la cible : -2",
-    "pr": 3,
+    "notes": "Charges : 3 · RM de la cible : -2",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 3
   },
   {
     "id": "objet-376",
@@ -6166,13 +6182,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "5 · RM de la cible : -2",
-    "pr": 5,
+    "notes": "Charges : 5 · RM de la cible : -2",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-377",
@@ -6183,13 +6200,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "3 · RM de la cible : -3",
-    "pr": 3,
+    "notes": "Charges : 3 · RM de la cible : -3",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 3
   },
   {
     "id": "objet-378",
@@ -6200,13 +6218,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "5 · RM de la cible : -3",
-    "pr": 5,
+    "notes": "Charges : 5 · RM de la cible : -3",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-379",
@@ -6217,13 +6236,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "5 · RM de la cible : -4",
-    "pr": 5,
+    "notes": "Charges : 5 · RM de la cible : -4",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-380",
@@ -6234,13 +6254,14 @@
     "currency": "PO",
     "source": "Fangh - Equipement Sorciers.pdf",
     "page": 1,
-    "notes": "5 · RM de la cible : -4",
-    "pr": 5,
+    "notes": "Charges : 5 · RM de la cible : -4",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires magiques",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-381",
@@ -6543,14 +6564,15 @@
     "currency": "PO",
     "source": "Fangh - Equipements Prêtres.pdf",
     "page": 1,
-    "notes": "3 · Dégâts +4",
-    "pr": 3,
+    "notes": "Charges : 3 · Dégâts +4",
+    "pr": null,
     "level": 1,
     "originalCategory": "Divers",
     "originalSection": "Accessoires de prêtres",
     "catalog": "standard",
     "starterAvailable": false,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 3
   },
   {
     "id": "objet-399",
@@ -6561,14 +6583,15 @@
     "currency": "PO",
     "source": "Fangh - Equipements Prêtres.pdf",
     "page": 1,
-    "notes": "3 · Dépense PA-3",
-    "pr": 3,
+    "notes": "Charges : 3 · Dépense PA-3",
+    "pr": null,
     "level": 1,
     "originalCategory": "Divers",
     "originalSection": "Accessoires de prêtres",
     "catalog": "standard",
     "starterAvailable": false,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 3
   },
   {
     "id": "objet-400",
@@ -6579,14 +6602,15 @@
     "currency": "PO",
     "source": "Fangh - Equipements Prêtres.pdf",
     "page": 1,
-    "notes": "5 · Dépense PA-4",
-    "pr": 5,
+    "notes": "Charges : 5 · Dépense PA-4",
+    "pr": null,
     "level": 1,
     "originalCategory": "Divers",
     "originalSection": "Accessoires de prêtres",
     "catalog": "standard",
     "starterAvailable": false,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-401",
@@ -6597,13 +6621,14 @@
     "currency": "PO",
     "source": "Fangh - Equipements Prêtres.pdf",
     "page": 1,
-    "notes": "3 · Prodige : épreuve+2",
-    "pr": 3,
+    "notes": "Charges : 3 · Prodige : épreuve+2",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires de prêtres",
     "catalog": "standard",
     "starterAvailable": false,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 3
   },
   {
     "id": "objet-402",
@@ -6614,13 +6639,14 @@
     "currency": "PO",
     "source": "Fangh - Equipements Prêtres.pdf",
     "page": 1,
-    "notes": "5 · Prodige : épreuve+2",
-    "pr": 5,
+    "notes": "Charges : 5 · Prodige : épreuve+2",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires de prêtres",
     "catalog": "standard",
     "starterAvailable": false,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-403",
@@ -6631,13 +6657,14 @@
     "currency": "PO",
     "source": "Fangh - Equipements Prêtres.pdf",
     "page": 1,
-    "notes": "3 · RM de la cible : -2",
-    "pr": 3,
+    "notes": "Charges : 3 · RM de la cible : -2",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires de prêtres",
     "catalog": "standard",
     "starterAvailable": false,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 3
   },
   {
     "id": "objet-404",
@@ -6648,13 +6675,14 @@
     "currency": "PO",
     "source": "Fangh - Equipements Prêtres.pdf",
     "page": 1,
-    "notes": "3 · RM de la cible : -3",
-    "pr": 3,
+    "notes": "Charges : 3 · RM de la cible : -3",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires de prêtres",
     "catalog": "standard",
     "starterAvailable": false,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 3
   },
   {
     "id": "objet-405",
@@ -6665,13 +6693,14 @@
     "currency": "PO",
     "source": "Fangh - Equipements Prêtres.pdf",
     "page": 1,
-    "notes": "5 · RM de la cible : -4",
-    "pr": 5,
+    "notes": "Charges : 5 · RM de la cible : -4",
+    "pr": null,
     "originalCategory": "Divers",
     "originalSection": "Accessoires de prêtres",
     "catalog": "standard",
     "starterAvailable": false,
-    "kind": "misc"
+    "kind": "misc",
+    "charges": 5
   },
   {
     "id": "objet-406",
@@ -9985,7 +10014,8 @@
     "originalSection": "Sacs et transport",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "bag"
+    "kind": "bag",
+    "capacityKg": 3.0
   },
   {
     "id": "objet-614",
@@ -10001,7 +10031,8 @@
     "originalSection": "Sacs et transport",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "bag"
+    "kind": "bag",
+    "capacityKg": 10.0
   },
   {
     "id": "objet-615",
@@ -10017,7 +10048,8 @@
     "originalSection": "Sacs et transport",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "bag"
+    "kind": "bag",
+    "capacityKg": 15.0
   },
   {
     "id": "objet-616",
@@ -10033,7 +10065,8 @@
     "originalSection": "Sacs et transport",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "bag"
+    "kind": "bag",
+    "capacityKg": 5.0
   },
   {
     "id": "objet-617",
@@ -10049,7 +10082,8 @@
     "originalSection": "Sacs et transport",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "bag"
+    "kind": "bag",
+    "capacityKg": 8.0
   },
   {
     "id": "objet-618",
@@ -10065,7 +10099,8 @@
     "originalSection": "Sacs et transport",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "bag"
+    "kind": "bag",
+    "capacityKg": 30.0
   },
   {
     "id": "objet-619",
@@ -10081,7 +10116,8 @@
     "originalSection": "Sacs et transport",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "bag"
+    "kind": "bag",
+    "capacityGold": 50
   },
   {
     "id": "objet-620",
@@ -10097,7 +10133,8 @@
     "originalSection": "Sacs et transport",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "bag"
+    "kind": "bag",
+    "capacityGold": 100
   },
   {
     "id": "objet-621",
@@ -10113,7 +10150,8 @@
     "originalSection": "Sacs et transport",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "bag"
+    "kind": "bag",
+    "capacityGold": 250
   },
   {
     "id": "objet-622",
@@ -10129,7 +10167,8 @@
     "originalSection": "Sacs et transport",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "bag"
+    "kind": "bag",
+    "capacityGold": 250
   },
   {
     "id": "objet-623",
@@ -10145,7 +10184,8 @@
     "originalSection": "Sacs et transport",
     "catalog": "standard",
     "starterAvailable": true,
-    "kind": "bag"
+    "kind": "bag",
+    "capacityGold": 1000
   },
   {
     "id": "objet-624",

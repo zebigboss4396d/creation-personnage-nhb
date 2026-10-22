@@ -24,3 +24,5 @@
 .beast-versions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:8px 0 18px;padding-left:27px;color:#573920}
 .beast-versions li{padding:5px 0}
 @media(max-width:520px){.beast-roll{gap:10px}.beast-die{width:66px;height:66px;font-size:2rem}.beast-roll-button{flex:1}.beast-versions{grid-template-columns:1fr}}
+
+.fortune-roll-panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px;margin:20px 0}.fortune-roll-panel{padding:16px;border:1px solid #bba07d;border-radius:14px;background:#f6ead3}.fortune-roll-panel h3{margin:0 0 18px}.fortune-dice-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.fortune-die{box-shadow:0 3px 8px #5b381b22}.fortune-die:not(:disabled):hover{background:#f4ddba;box-shadow:0 4px 12px #5b381b44}.fortune-die:focus-visible{outline:3px solid #7f4d25;outline-offset:3px}.fortune-formula{font-weight:700;line-height:1.6;min-height:1.6em}.fortune-roll-panel .roll-actions{display:flex;flex-wrap:wrap;gap:8px}.fortune-roll-panel .roll-actions button{white-space:normal;max-width:100%}@media(max-width:520px){.fortune-roll-panel{padding:13px}.fortune-dice-row{gap:10px}}

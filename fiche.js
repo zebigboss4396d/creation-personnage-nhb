@@ -51,7 +51,7 @@ export function withEffects(data,weaponIndex=0,armorIndices=defaultArmorIndices(
  return {...data,effect,values:effect.values,groups:[...otherGroups,['Effets du matériel',[...effectsLines,...itemLines]],...magicGroups]};
 }
 function textField(form,name,value,max=100){
- try{const field=form.getTextField(name);if(typeof field.disableCombing==='function')field.disableCombing();if(/^Text(?:[2-7])?$/.test(name))field.setFontSize(30);if(/^(?:ArmeBonMal|ArmureBonMal|Arme0|Armure0)/.test(name))field.setFontSize(9);field.setText(String(value??'').slice(0,max));return true;}catch{return false;}
+ try{const field=form.getTextField(name);if(typeof field.disableCombing==='function')field.disableCombing();if(/^Text(?:[2-7])?$/.test(name))field.setFontSize(30);if(/^(?:ArmeBonMal|ArmureBonMal|Arme0|Armure0)/.test(name))field.setFontSize(9);field.setText(pdfFieldText(value).slice(0,max));return true;}catch{return false;}
 }
 function fillInteractive(form,d){
  const s=d.stats,v=d.values,e=d.equipment,fx=d.effect;
@@ -114,7 +114,8 @@ function fillClassic(form,d,font=null){
   try{form.getCheckBox(d.sex==='Masculin'?'Sexe1':'Sexe2').check();}catch{}
  }
 }
-function printable(v){return String(v??'').replace(/[\u0000-\u001f]/g,' ').replace(/[^\u0020-\u00ff\u0152\u0153\u0160\u0161\u0178\u20ac\u2018\u2019\u201c\u201d\u2013\u2014]/gu,'?').replace(/[\u0152\u0153\u0160\u0161\u0178\u2018\u2019\u201c\u201d\u2013\u2014]/g,c=>({'Œ':'OE','œ':'oe','Š':'S','š':'s','Ÿ':'Y','‘':"'",'’':"'",'“':'"','”':'"','–':'-','—':'-'}[c]||c));}
+export function pdfFieldText(value){return String(value??'').replace(/\r\n?/g,'\n').split('\n').map(line=>printable(line.replace(/\u2212/g,'-').replace(/[\u00a0\u202f]/g,' '))).join('\n');}
+function printable(v){return String(v??'').replace(/\u2212/g,'-').replace(/[\u0000-\u001f]/g,' ').replace(/[^\u0020-\u00ff\u0152\u0153\u0160\u0161\u0178\u20ac\u2018\u2019\u201c\u201d\u2013\u2014]/gu,'?').replace(/[\u0152\u0153\u0160\u0161\u0178\u2018\u2019\u201c\u201d\u2013\u2014]/g,c=>({'Œ':'OE','œ':'oe','Š':'S','š':'s','Ÿ':'Y','‘':"'",'’':"'",'“':'"','”':'"','–':'-','—':'-'}[c]||c));}
 function wrap(text,font,size,maxWidth){const words=printable(text).split(/\s+/);const lines=[];let line='';for(const word of words){const trial=line?line+' '+word:word;if(font.widthOfTextAtSize(trial,size)>maxWidth&&line){lines.push(line);line=word;}else line=trial;}if(line)lines.push(line);return lines;}
 function addAnnex(pdf,d){const {StandardFonts,rgb}=window.PDFLib;return (async()=>{
  const font=await pdf.embedFont(StandardFonts.Helvetica),bold=await pdf.embedFont(StandardFonts.HelveticaBold);
